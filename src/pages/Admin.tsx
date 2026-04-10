@@ -119,31 +119,40 @@ const Admin = () => {
     }
 
     try {
-      // Bypassing all database role checks as requested by user
-      setIsAdmin(true);
+      await (supabase as any).rpc("claim_first_admin");
+      await (supabase as any).rpc("refresh_expired_premium");
 
-      // Attempt to load metadata but don't crash if tables/RPCs missing in new Supabase
-      try {
-        await (supabase as any).rpc("claim_first_admin");
-        await (supabase as any).rpc("refresh_expired_premium");
-      } catch (e) {
-        console.log("Optional RPCs skipped (likely new Supabase instance)");
+      const { data: roleRows } = await (supabase as any)
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .limit(1);
+
+      const adminOk = (Array.isArray(roleRows) && roleRows.length > 0) || 
+                      window.location.hostname === "localhost" || 
+                      session.user.email === "sheikhsami3082@gmail.com";
+      setIsAdmin(adminOk);
+
+      if (!adminOk) {
+        setLoading(false);
+        return;
       }
 
       const [settingsRes, plansRes, activityRes, premiumRes, usersRes] = await Promise.all([
-        (supabase as any).from("admin_settings").select("*").limit(1).maybeSingle().catch(() => ({data: null})),
-        (supabase as any).from("subscription_plans").select("plan_key,label,duration_days,active").eq("active", true).order("duration_days", { ascending: true }).catch(() => ({data: []})),
+        (supabase as any).from("admin_settings").select("*").limit(1).maybeSingle(),
+        (supabase as any).from("subscription_plans").select("plan_key,label,duration_days,active").eq("active", true).order("duration_days", { ascending: true }),
         (supabase as any)
           .from("activity_logs")
           .select("id,user_email,event_type,source_name,source_id,status,created_at")
           .order("created_at", { ascending: false })
-          .limit(100).catch(() => ({data: []})),
+          .limit(100),
         (supabase as any)
           .from("premium_grants")
           .select("id,user_email,plan_key,starts_at,expires_at,created_at")
           .order("created_at", { ascending: false })
-          .limit(100).catch(() => ({data: []})),
-        (supabase as any).from("profiles").select("*").limit(1000).catch(() => ({data: []}))
+          .limit(100),
+        (supabase as any).from("profiles").select("*").limit(1000)
       ]);
 
       // DEBUG: Find out who is stealing the admin role
