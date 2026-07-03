@@ -258,7 +258,7 @@ export default function CloneFolderPanel() {
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
-      <Card className="p-6 bg-card/60 backdrop-blur-md border-border glass-card">
+      <Card className="p-6 bg-card/60 backdrop-blur-md border-border glass-card min-w-0">
         <div className="flex items-start gap-4">
           <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shadow-glow-primary">
             <Zap className="h-6 w-6 text-primary" />
@@ -323,7 +323,7 @@ export default function CloneFolderPanel() {
                     <span className="text-xs font-bold uppercase tracking-widest">Selected Content</span>
                   </div>
                 </div>
-                <div className="max-h-[250px] overflow-y-auto custom-scrollbar pr-2">
+                <div className="max-h-[250px] overflow-y-auto overflow-x-hidden custom-scrollbar pr-2 w-full min-w-0">
                   <TreeItem node={scannedTree} selected={selectedItems} onToggle={handleToggle} />
                 </div>
               </div>
