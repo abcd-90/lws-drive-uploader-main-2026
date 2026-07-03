@@ -170,7 +170,17 @@ export default function CloneFolderPanel() {
       setSelectedItems(initial);
       toast({ title: "Nitro Scan Ready" });
     } catch (e: any) {
-      toast({ title: "Scan Failed", description: e.message, variant: "destructive" });
+      const msg = e.message || String(e);
+      if (msg.includes("401") || msg.includes("Invalid Credentials") || msg.includes("unauthorized")) {
+        drive.disconnect();
+        toast({
+          title: "Session Expired",
+          description: "Google Drive login session expire ho gaya hai. Please 'Connect Google Drive' par click karke dubara login/connect karein.",
+          variant: "destructive"
+        });
+      } else {
+        toast({ title: "Scan Failed", description: msg, variant: "destructive" });
+      }
     } finally {
       setScanning(false);
       setProgress(null);
@@ -248,7 +258,17 @@ export default function CloneFolderPanel() {
       setScannedTree(null);
       setInjectedFiles([]);
     } catch (e: any) {
-      toast({ title: "Transfer Failed", description: e.message, variant: "destructive" });
+      const msg = e.message || String(e);
+      if (msg.includes("401") || msg.includes("Invalid Credentials") || msg.includes("unauthorized")) {
+        drive.disconnect();
+        toast({
+          title: "Session Expired",
+          description: "Google Drive login session expire ho gaya hai. Please 'Connect Google Drive' par click karke dubara login/connect karein.",
+          variant: "destructive"
+        });
+      } else {
+        toast({ title: "Transfer Failed", description: msg, variant: "destructive" });
+      }
     } finally {
       setBusy(false);
     }
