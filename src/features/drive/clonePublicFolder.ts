@@ -218,7 +218,19 @@ export async function clonePublicFolderToMyDrive(params: {
     name: params.destFolderName || tree.name 
   }));
 
-  const folderLimit = createLimiter(6);
+  // Count total subfolders to create for progress logging
+  let totalFolders = 0;
+  const countSubfolders = (node: TreeNode) => {
+    if (params.selectedIds && !params.selectedIds.has(node.id)) return;
+    if (node.kind === "folder") {
+      totalFolders++;
+      node.children.forEach(countSubfolders);
+    }
+  };
+  tree.children.forEach(countSubfolders);
+
+  let foldersCreated = 0;
+  const folderLimit = createLimiter(10); // Safe limit (10 QPS) to speed up folder creation by ~66%
 
   async function processNode(node: TreeNode, destParentId: string) {
     if (params.selectedIds && !params.selectedIds.has(node.id)) {
@@ -233,6 +245,13 @@ export async function clonePublicFolderToMyDrive(params: {
       return;
     }
     const created = await withNitroRetry(() => folderLimit(() => myDriveCreateFolder({ accessToken: params.accessToken, name: nameTransform(node.name), parentId: destParentId })));
+    foldersCreated++;
+    onProgress?.({ 
+      phase: "creating_folders", 
+      message: `Nitro Initializing: Creating folder ${foldersCreated}/${totalFolders}...`, 
+      done: foldersCreated, 
+      total: totalFolders > 0 ? totalFolders : 1 
+    });
     await Promise.all(node.children.map(c => processNode(c, created.id)));
   }
 
