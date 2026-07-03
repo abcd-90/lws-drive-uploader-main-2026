@@ -55,9 +55,10 @@ export async function buildPublicFolderTree(params: {
 }) {
   const limit = createLimiter(20);
   const keywords = params.filterKeywords?.map(k => k.toLowerCase().trim()) || [];
+  let itemsCount = 0;
 
   async function walk(folderId: string, folderName: string): Promise<TreeNode> {
-    params.onProgress?.({ phase: "listing", message: `Scanning: ${folderName}`, done: 0, total: 0 });
+    params.onProgress?.({ phase: "listing", message: `Nitro Scanning: ${itemsCount} items found...`, done: 0, total: 0 });
     const children = await withNitroRetry(() => limit(() => publicDriveListChildren({
       apiKey: params.apiKey,
       accessToken: params.accessToken,
@@ -71,6 +72,8 @@ export async function buildPublicFolderTree(params: {
       // NITRO CLEANER: Auto-skip files matching keywords
       const lowerName = item.name.toLowerCase();
       if (keywords.some(k => k && lowerName.includes(k))) continue;
+
+      itemsCount++;
 
       if (item.mimeType === "application/vnd.google-apps.folder" || (item.mimeType === "application/vnd.google-apps.shortcut" && item.shortcutDetails?.targetMimeType === "application/vnd.google-apps.folder")) {
         folders.push({ id: item.shortcutDetails?.targetId || item.id, name: item.name });
@@ -245,17 +248,28 @@ export async function clonePublicFolderToMyDrive(params: {
 
   const total = flattenFiles.length + injectionCount;
   let done = 0;
+  let failed = 0;
 
   const copyTask = async (item: any) => {
     const sourceId = item.node.shortcutTarget?.id ?? item.node.id;
     try {
-      await withNitroRetry(() => myDriveCopyFile({ accessToken: params.accessToken, sourceFileId: sourceId, parentId: item.parentId, name: nameTransform(item.node.name) }));
-    } catch {
-      const dl = await withNitroRetry(() => publicDriveDownloadFile({ apiKey: params.apiKey, accessToken: params.accessToken, fileId: sourceId, mimeType: item.node.mimeType }));
-      await withNitroRetry(() => myDriveUploadFile({ accessToken: params.accessToken, parentId: item.parentId, name: nameTransform(item.node.name + dl.nameSuffix), blob: dl.blob, contentType: dl.contentType }));
+      try {
+        await withNitroRetry(() => myDriveCopyFile({ accessToken: params.accessToken, sourceFileId: sourceId, parentId: item.parentId, name: nameTransform(item.node.name) }));
+      } catch (copyErr) {
+        // Fallback: download and upload
+        const dl = await withNitroRetry(() => publicDriveDownloadFile({ apiKey: params.apiKey, accessToken: params.accessToken, fileId: sourceId, mimeType: item.node.mimeType }));
+        await withNitroRetry(() => myDriveUploadFile({ accessToken: params.accessToken, parentId: item.parentId, name: nameTransform(item.node.name + dl.nameSuffix), blob: dl.blob, contentType: dl.contentType }));
+      }
+    } catch (err) {
+      console.warn(`Failed to clone ${item.node.name}:`, err);
+      failed++;
+    } finally {
+      done++;
+      const msg = failed > 0 
+        ? `Nitro Cloning: ${done}/${total} (${failed} failed)` 
+        : `Nitro Cloning: ${done}/${total}`;
+      onProgress?.({ phase: "copying", message: msg, done, total });
     }
-    done++;
-    onProgress?.({ phase: "copying", message: `Nitro Cloning: ${done}/${total}`, done, total });
   };
 
   await Promise.all(flattenFiles.map(item => turboLimit(() => copyTask(item))));
@@ -265,14 +279,23 @@ export async function clonePublicFolderToMyDrive(params: {
     const targetFolders = uniqueReplacementParents.length > 0 ? uniqueReplacementParents : [rootDest.id];
     const injectionTasks = targetFolders.flatMap(parentId =>
       params.injectedFiles!.map((f) => turboLimit(async () => {
-        await withNitroRetry(() => myDriveUploadFile({ accessToken: params.accessToken, parentId, name: f.name, blob: f, contentType: f.type }));
-        done++;
-        onProgress?.({ phase: "copying", message: `Injected: ${f.name}`, done, total });
+        try {
+          await withNitroRetry(() => myDriveUploadFile({ accessToken: params.accessToken, parentId, name: f.name, blob: f, contentType: f.type }));
+        } catch (err) {
+          console.warn(`Failed to inject file ${f.name}:`, err);
+          failed++;
+        } finally {
+          done++;
+          const msg = failed > 0 
+            ? `Nitro Cloning: ${done}/${total} (${failed} failed)` 
+            : `Nitro Cloning: ${done}/${total}`;
+          onProgress?.({ phase: "copying", message: msg, done, total });
+        }
       }))
     );
     await Promise.all(injectionTasks);
   }
 
-  onProgress?.({ phase: "done", message: "Nitro Transfer Complete!", done: total, total });
+  onProgress?.({ phase: "done", message: failed > 0 ? `Nitro Transfer Complete! (${failed} failed)` : "Nitro Transfer Complete!", done: total, total });
   return { totalFiles: total, destinationFolderId: rootDest.id };
 }
