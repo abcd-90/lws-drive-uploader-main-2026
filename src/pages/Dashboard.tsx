@@ -94,6 +94,16 @@ const Dashboard = () => {
     localStorage.setItem("lws_google_public_api_key", apiKey.trim());
   }, [siteConfig.googleClientId, siteConfig.googleApiKey]);
 
+  useEffect(() => {
+    if (drive.error) {
+      toast({
+        title: "Google Drive Connection Error",
+        description: drive.error,
+        variant: "destructive",
+      });
+    }
+  }, [drive.error, toast]);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/");
