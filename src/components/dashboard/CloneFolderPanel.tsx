@@ -44,16 +44,19 @@ function TreeItem({ node, selected, onToggle, depth = 0 }: { node: TreeNode; sel
   const isFolder = node.kind === "folder";
   return (
     <div className="select-none min-w-0 w-full overflow-hidden">
-      <div className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-primary/5 transition-colors group min-w-0">
-        <div style={{ width: `${depth * 16}px` }} />
+      <div className="flex items-center gap-1.5 py-1 px-1 rounded-md hover:bg-primary/5 transition-colors group min-w-0">
+        <div style={{ width: `${depth * 8}px` }} />
         {isFolder ? (
-          <button onClick={() => setExpanded(!expanded)} className="p-0.5 hover:bg-muted rounded text-muted-foreground">
-            {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          <button 
+            onClick={() => setExpanded(!expanded)} 
+            className="h-4 w-4 flex items-center justify-center hover:bg-muted rounded text-muted-foreground shrink-0"
+          >
+            {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
           </button>
-        ) : <div className="w-5" />}
-        <Checkbox checked={selected[node.id]} onCheckedChange={(v) => onToggle(node.id, !!v)} />
-        {isFolder ? <Folder className="h-4 w-4 text-yellow-500 fill-yellow-500/20" /> : <File className="h-4 w-4 text-blue-400" />}
-        <span className="text-xs font-medium truncate flex-1">{node.name}</span>
+        ) : <div className="w-4 shrink-0" />}
+        <Checkbox checked={selected[node.id]} onCheckedChange={(v) => onToggle(node.id, !!v)} className="scale-90" />
+        {isFolder ? <Folder className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500/20 shrink-0" /> : <File className="h-3.5 w-3.5 text-blue-400 shrink-0" />}
+        <span className="text-[11px] sm:text-xs font-medium truncate flex-1">{node.name}</span>
       </div>
       {isFolder && expanded && node.children?.map(child => <TreeItem key={child.id} node={child} selected={selected} onToggle={onToggle} depth={depth + 1} />)}
     </div>
@@ -258,7 +261,7 @@ export default function CloneFolderPanel() {
 
   return (
     <div className="grid lg:grid-cols-2 gap-6">
-      <Card className="p-6 bg-card/60 backdrop-blur-md border-border glass-card min-w-0">
+      <Card className="p-3 sm:p-6 bg-card/60 backdrop-blur-md border-border glass-card min-w-0">
         <div className="flex items-start gap-4">
           <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shadow-glow-primary">
             <Zap className="h-6 w-6 text-primary" />
@@ -316,7 +319,7 @@ export default function CloneFolderPanel() {
 
           {scannedTree && (
             <div className="space-y-4 animate-in slide-in-from-top-4 duration-500">
-              <div className="rounded-xl border border-border/50 bg-background/30 p-4">
+              <div className="rounded-xl border border-border/50 bg-background/30 p-2 sm:p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-primary" />
