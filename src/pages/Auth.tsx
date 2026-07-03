@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,11 +118,10 @@ const Auth = () => {
   };
 
   const handleGoogleAuth = async () => {
-    // In preview/embedded contexts Google redirects often fail (state mismatch / blocked cookies).
     if (isInIframe) {
       toast({
-        title: "Google login preview me block",
-        description: "Is page ko new tab me open karke phir 'Continue with Google' try karein.",
+        title: "Block in iframe",
+        description: "Open in a new tab to use Google login.",
         variant: "destructive",
       });
       return;
@@ -130,30 +129,26 @@ const Auth = () => {
 
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        // For Lovable Cloud managed OAuth broker, keep this as origin (not /auth) to avoid state mismatch.
-        redirect_uri: window.location.origin,
-        extraParams: {
-          prompt: "select_account",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: { prompt: 'select_account' }
         },
       });
-
-      if (result?.error) throw result.error;
-
-      // If it didn't hard-redirect (rare), we still navigate after session is set.
-      if (!result?.redirected) {
-        navigate("/dashboard");
-      }
+      if (error) throw error;
     } catch (error: any) {
       toast({
         title: "Google login failed",
-        description: String(error?.message || error),
+        description: "Bhai, Supabase mein Google provider enable karein pehle.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-background grid md:grid-cols-2">
@@ -171,7 +166,7 @@ const Auth = () => {
                 <Zap className="h-7 w-7 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-primary">LWS Drive</h1>
+                <h1 className="text-2xl font-bold text-primary">NitroDrive</h1>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Ultra Fast Uploader</p>
               </div>
             </div>
@@ -182,17 +177,19 @@ const Auth = () => {
               </h2>
               <p className="text-muted-foreground">
                 {isLogin 
-                  ? "Sign in to continue to LWS Drive" 
+                  ? "Sign in to continue to NitroDrive" 
                   : "Start uploading files at lightning speed"}
               </p>
             </div>
 
-            <Button
-              variant="outline"
-              className="w-full mb-6"
-              onClick={handleGoogleAuth}
-              disabled={loading}
-            >
+
+
+              <Button
+                variant="outline"
+                className="w-full mb-6"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+              >
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -313,7 +310,7 @@ const Auth = () => {
             Upload at <span className="text-primary">Light Speed</span>
           </h2>
           <p className="text-muted-foreground mb-8">
-            Join thousands of users who trust LWS Drive for their fastest uploads ever.
+            Join thousands of users who trust NitroDrive for their fastest uploads ever.
           </p>
           <div className="grid grid-cols-3 gap-4">
             <div>

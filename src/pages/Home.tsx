@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,32 +18,45 @@ import {
   Zap,
 } from "lucide-react";
 import { WhatsAppModal } from "@/components/WhatsAppModal";
+import { CommunityBanner } from "@/components/CommunityBanner";
 import heroBg from "@/assets/hero-bg.jpg";
-
-const WHATSAPP_CHANNEL_URL = "https://www.whatsapp.com/channel/0029Vb688BZ6GcGO9OwJc621";
+import { fetchSiteConfig, DEFAULT_CONFIG } from "@/lib/siteConfig";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [channelLink, setChannelLink] = useState(DEFAULT_CONFIG.channelLink);
+
+  useEffect(() => {
+    fetchSiteConfig().then(cfg => {
+      if (cfg.channelLink) setChannelLink(cfg.channelLink);
+    }).catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
+      <CommunityBanner />
       <WhatsAppModal />
 
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/70 backdrop-blur-xl">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <Link to="/" className="group flex items-center gap-3">
+          <div 
+            onDoubleClick={() => navigate("/admin")}
+            className="group flex items-center gap-3 cursor-default select-none"
+          >
             <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-hero shadow-glow-primary">
               <Zap className="h-5 w-5 text-primary-foreground" />
               <span className="pointer-events-none absolute -inset-1 rounded-xl opacity-0 ring-1 ring-ring/50 transition-opacity group-hover:opacity-100" />
             </div>
             <div className="leading-tight">
               <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight">LWS Drive</span>
+                <span className="text-lg font-bold tracking-tight">NitroDrive</span>
                 <Badge variant="secondary" className="border border-border/60">
                   Pro-grade
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">Ultra fast uploader • clone • manage</p>
             </div>
-          </Link>
+          </div>
 
           <nav className="hidden items-center gap-2 md:flex">
             <Link to="/auth?mode=login">
@@ -122,7 +136,7 @@ const Home = () => {
                 </Link>
 
                 <Button type="button" variant="outline" size="lg" className="w-full sm:w-auto" asChild>
-                  <a href={WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={channelLink} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="h-5 w-5" />
                     Join channel
                   </a>
@@ -357,7 +371,7 @@ const Home = () => {
                   </Button>
                 </Link>
                 <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
-                  <a href={WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={channelLink} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="h-5 w-5" />
                     Join WhatsApp channel
                   </a>
@@ -365,23 +379,72 @@ const Home = () => {
               </div>
             </div>
           </Card>
-
-          <footer className="mt-10 flex flex-col gap-2 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-            <p>© {new Date().getFullYear()} LWS Drive. All rights reserved.</p>
-            <div className="flex items-center gap-3">
-              <Link to="/auth?mode=login" className="hover:text-foreground transition-colors">
-                Login
-              </Link>
-              <Link to="/auth?mode=signup" className="hover:text-foreground transition-colors">
-                Signup
-              </Link>
-            </div>
-          </footer>
         </section>
       </main>
+
+      <footer className="border-t border-border/40 bg-muted/10 pt-16 pb-12">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-12 md:grid-cols-4">
+            {/* Brand Section */}
+            <div className="md:col-span-2 space-y-5">
+              <div 
+                onDoubleClick={() => navigate("/admin")}
+                className="flex items-center gap-3 cursor-default select-none"
+              >
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-hero shadow-glow-primary">
+                  <Zap className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="text-xl font-bold tracking-tight">NitroDrive</span>
+              </div>
+              <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+                The fastest uploader toolkit for Google Drive. Clone, manage, and batch upload with ridiculous speeds.
+              </p>
+              <div className="flex items-center gap-3">
+                <a href={channelLink} target="_blank" rel="noopener noreferrer" 
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary hover:bg-[#facc15] hover:text-neutral-950 transition-all">
+                  <MessageCircle className="h-5 w-5" />
+                </a>
+                <div className="h-4 w-px bg-border" />
+                <p className="text-xs font-medium text-muted-foreground">Join our community</p>
+              </div>
+            </div>
+
+            {/* Navigation Columns */}
+            <div>
+              <h4 className="mb-5 font-bold text-sm uppercase tracking-widest text-foreground">Product</h4>
+              <ul className="space-y-3 text-sm">
+                <li><Link to="/auth?mode=login" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</Link></li>
+                <li><button onClick={() => window.scrollTo({top: 0, behavior: "smooth"})} className="text-muted-foreground hover:text-primary transition-colors">Features</button></li>
+                <li><Link to="/auth?mode=signup" className="text-muted-foreground hover:text-primary transition-colors text-yellow-500 font-medium">Upgrade Pro 💎</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="mb-5 font-bold text-sm uppercase tracking-widest text-foreground">Legal & Support</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a></li>
+                <li><a href="mailto:nitrodrive.official@gmail.com" className="text-muted-foreground hover:text-primary transition-colors">Contact Support</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t border-border/20 pt-8 md:flex-row">
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} <span className="font-semibold">NitroDrive Industries</span>. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                <span className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground">System Operational</span>
+              </div>
+              <Badge variant="outline" className="text-[10px] opacity-60">v3.4.2</Badge>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
 export default Home;
-

@@ -17,9 +17,19 @@ import {
 } from "lucide-react";
 
 const Pricing = () => {
-  const whatsappNumber = "+923331514196"; // Update with actual number
-  const whatsappLink = (plan: string, amount: string) => 
-    `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=I%20want%20to%20buy%20${plan}%20(${amount})`;
+  const siteConfig = (() => {
+    try { return JSON.parse(localStorage.getItem("lws_admin_config") || "{}"); } catch { return {}; }
+  })();
+
+  const prices = {
+    weekly: siteConfig.weeklyPrice || 299,
+    monthly: siteConfig.monthlyPrice || 799,
+    yearly: siteConfig.yearlyPrice || 4999,
+  };
+
+  const whatsappNumber = siteConfig.paymentNumber || "+923107701416";
+  const whatsappLink = (plan: string, amount: string | number) => 
+    `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=I%20want%20to%20buy%20${plan}%20(${amount}%20PKR)`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,7 +41,7 @@ const Pricing = () => {
               <Zap className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-primary">LWS Drive</h1>
+              <h1 className="text-xl font-bold text-primary">{siteConfig.siteName || "NitroDrive"}</h1>
               <p className="text-xs text-muted-foreground uppercase tracking-wide">Ultra Fast Uploader</p>
             </div>
           </Link>
@@ -119,7 +129,7 @@ const Pricing = () => {
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold text-primary">100</span>
+                  <span className="text-5xl font-bold text-primary">{prices.weekly}</span>
                   <span className="text-muted-foreground">PKR / week</span>
                 </div>
               </div>
@@ -136,7 +146,7 @@ const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <a href={whatsappLink("Pro Weekly", "100 PKR")} target="_blank" rel="noopener noreferrer">
+              <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Buy on WhatsApp
@@ -159,10 +169,9 @@ const Pricing = () => {
               </div>
               <div className="mb-6">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold text-primary">200</span>
+                  <span className="text-5xl font-bold text-primary">{prices.monthly}</span>
                   <span className="text-muted-foreground">PKR / month</span>
                 </div>
-                <p className="text-sm text-primary mt-1">Save 50% vs weekly!</p>
               </div>
               <ul className="space-y-3 mb-8">
                 {[
@@ -178,7 +187,7 @@ const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <a href={whatsappLink("Pro Monthly", "200 PKR")} target="_blank" rel="noopener noreferrer">
+              <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer">
                 <Button variant="hero" className="w-full" size="lg">
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Buy on WhatsApp
@@ -259,14 +268,14 @@ const Pricing = () => {
             </Button>
           </a>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <a href={whatsappLink("Pro Monthly", "200 PKR")} target="_blank" rel="noopener noreferrer">
+            <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer">
               <Button variant="hero" size="lg">
-                Get Pro Monthly - 200 PKR
+                Get Pro Monthly - {prices.monthly} PKR
               </Button>
             </a>
-            <a href={whatsappLink("Pro Weekly", "100 PKR")} target="_blank" rel="noopener noreferrer">
+            <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="lg" className="border-primary hover:bg-primary hover:text-primary-foreground">
-                Get Pro Weekly - 100 PKR
+                Get Pro Weekly - {prices.weekly} PKR
               </Button>
             </a>
           </div>

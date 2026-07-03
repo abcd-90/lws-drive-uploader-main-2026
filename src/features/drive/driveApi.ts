@@ -4,6 +4,8 @@ export type DriveFileItem = {
   mimeType: string;
   modifiedTime?: string;
   size?: string;
+  thumbnailLink?: string;
+  webViewLink?: string;
 };
 
 export async function driveListFiles(params: {
@@ -15,7 +17,7 @@ export async function driveListFiles(params: {
   const sp = new URLSearchParams();
   sp.set("q", params.q);
   sp.set("pageSize", String(params.pageSize ?? 100));
-  sp.set("fields", params.fields ?? "files(id,name,mimeType,modifiedTime,size)");
+  sp.set("fields", params.fields ?? "files(id,name,mimeType,modifiedTime,size,thumbnailLink,webViewLink)");
 
   const res = await fetch(`https://www.googleapis.com/drive/v3/files?${sp.toString()}`, {
     headers: {

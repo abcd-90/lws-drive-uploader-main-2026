@@ -97,7 +97,7 @@ export async function publicDriveGetFileMetadata(params: {
   fileId: string;
 }) {
   const sp = new URLSearchParams();
-  sp.set("fields", "id,name,mimeType");
+  sp.set("fields", "id,name,mimeType,shortcutDetails(targetId,targetMimeType)");
   sp.set("supportsAllDrives", "true");
   if (params.apiKey) sp.set("key", params.apiKey);
 
@@ -121,7 +121,7 @@ export async function publicDriveGetFileMetadata(params: {
     throw new Error(`Failed getting file metadata [${res.status}]: ${txt}`);
   }
 
-  return (await res.json()) as Pick<DrivePublicFile, "id" | "name" | "mimeType">;
+  return (await res.json()) as Pick<DrivePublicFile, "id" | "name" | "mimeType" | "shortcutDetails">;
 }
 
 function guessExportMime(mimeType: string) {

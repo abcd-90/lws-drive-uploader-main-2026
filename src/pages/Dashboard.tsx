@@ -5,14 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Zap, Gauge, Upload, FolderSync, Trash2, Shield } from "lucide-react";
+import { LogOut, Zap, Gauge, Upload, FolderSync, Trash2, Crown, Megaphone, CheckCircle2, AlertTriangle, Wrench } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useGoogleDriveAuth } from "@/features/drive/useGoogleDriveAuth";
 import CloneFolderPanel from "@/components/dashboard/CloneFolderPanel";
 import UploadFilesPanel from "@/components/dashboard/UploadFilesPanel";
 import ManageFilesPanel from "@/components/dashboard/ManageFilesPanel";
+import UpgradeModal from "@/components/dashboard/UpgradeModal";
+import { CommunityBanner } from "@/components/CommunityBanner";
+import { WhatsAppModal } from "@/components/WhatsAppModal";
+import { fetchSiteConfig, type SiteConfig, DEFAULT_CONFIG } from "@/lib/siteConfig";
 
 interface Profile {
   full_name: string;
+  is_pro: boolean;
+  pro_expires_at: string | null;
 }
 
 const Dashboard = () => {
@@ -20,135 +27,278 @@ const Dashboard = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const drive = useGoogleDriveAuth();
+
+  // Live config from Supabase (not just localStorage)
+  const [siteConfig, setSiteConfig] = useState<SiteConfig>(DEFAULT_CONFIG);
+  const [configReady, setConfigReady] = useState(false);
+
+  useEffect(() => {
+    // Fetch live site config from Supabase
+    fetchSiteConfig().then(cfg => {
+      setSiteConfig(cfg);
+      setConfigReady(true);
+    }).catch(() => setConfigReady(true));
+  }, []);
 
   useEffect(() => {
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      navigate("/auth?mode=login");
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { navigate("/auth?mode=login"); return; }
+
+      setUserId(session.user.id);
+      setUserEmail(session.user.email || "");
+
+      // Initializing core system roles
+      try { await (supabase as any).rpc("claim_first_admin"); } catch (_) {}
+      try { await (supabase as any).rpc("refresh_expired_premium"); } catch (_) {}
+
+      const { data: profileRes, error } = await (supabase as any)
+        .from("profiles")
+        .select("full_name, is_pro, pro_expires_at")
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (!error && profileRes) setProfile(profileRes);
+
+      // Log activity
+      try {
+        await (supabase as any).from("activity_logs").insert({
+          user_id: session.user.id,
+          user_email: session.user.email,
+          event_type: "login",
+          status: "success",
+          metadata: { source: "nitro_dashboard" },
+        });
+      } catch (_) {}
+    } catch (e) {
+      console.error("Auth check failed", e);
+    } finally {
+      setLoading(false);
     }
-
-    await (supabase as any).rpc("claim_first_admin");
-    await (supabase as any).rpc("refresh_expired_premium");
-
-    const [profileRes, roleRes] = await Promise.all([
-      supabase.from("profiles").select("full_name").eq("user_id", session.user.id).single(),
-      (supabase as any).from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "admin").limit(1),
-    ]);
-
-    if (profileRes.data) setProfile(profileRes.data);
-
-    const hasAdminRole = Array.isArray(roleRes.data) && roleRes.data.length > 0;
-    setIsAdmin(hasAdminRole);
-
-    await (supabase as any).from("activity_logs").insert({
-      user_id: session.user.id,
-      user_email: session.user.email,
-      event_type: "login",
-      status: "success",
-      metadata: { source: "dashboard" },
-    });
-
-    setLoading(false);
   };
+
+  useEffect(() => {
+    const clientId = siteConfig.googleClientId || "414112233584-tbobsjntokcq82fkcm7cajuhb8r1n93p.apps.googleusercontent.com";
+    const apiKey = siteConfig.googleApiKey || "AIzaSyC2CeH8R9aUMoVMeMQllc6hv1skCdoKHmE";
+    
+    // Using simple localStorage to ensure useGoogleDriveAuth sees them
+    localStorage.setItem("lws_google_client_id", clientId.trim());
+    localStorage.setItem("lws_google_public_api_key", apiKey.trim());
+  }, [siteConfig.googleClientId, siteConfig.googleApiKey]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate("/");
   };
 
-  if (loading) {
+  if (loading || !configReady) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Zap className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Zap className="h-10 w-10 animate-nitro-pulse text-primary" />
+          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nitro Loading...</p>
+        </div>
       </div>
     );
   }
 
+  // ── MAINTENANCE MODE BLOCKER ──
+  // If admin has turned on maintenance mode, show a maintenance page to all non-admin users
+  if (siteConfig.maintenanceMode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="w-full max-w-lg border-yellow-500/30 bg-card/60 backdrop-blur-md p-8 text-center">
+          <div className="flex flex-col items-center gap-6">
+            <div className="h-20 w-20 rounded-2xl bg-yellow-500/10 flex items-center justify-center">
+              <Wrench className="h-10 w-10 text-yellow-500 animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight mb-2">Under Maintenance</h1>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                {siteConfig.siteName || "NitroDrive"} is currently undergoing scheduled maintenance. 
+                We'll be back online shortly. Thank you for your patience!
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <span>All services are temporarily paused</span>
+            </div>
+            {siteConfig.channelLink && (
+              <a 
+                href={siteConfig.channelLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline"
+              >
+                Join our channel for updates →
+              </a>
+            )}
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" /> Logout
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  const isPro = profile?.is_pro;
+  // Only show paywall/upgrade when admin has ENABLED paidModeEnabled
+  const showPaywall = siteConfig.paidModeEnabled && !isPro;
+
   return (
     <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-background/80 backdrop-blur-md">
+      <CommunityBanner />
+      <WhatsAppModal />
+      {/* Announcement Banner */}
+      {siteConfig.showBanner && siteConfig.announcementBanner && (
+        <div className="bg-primary/90 text-primary-foreground text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-2 nitro-glow">
+          <Megaphone className="h-4 w-4" />
+          {siteConfig.announcementBanner}
+        </div>
+      )}
+
+      <nav className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-lg bg-gradient-hero flex items-center justify-center shadow-glow-primary">
+          <div 
+            onDoubleClick={() => navigate("/admin")}
+            className="flex items-center gap-3 cursor-default select-none"
+          >
+            <div className="h-10 w-10 rounded-xl bg-gradient-hero flex items-center justify-center shadow-glow-primary">
               <Zap className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-primary">LWS Drive</h1>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Dashboard</p>
+              <h1 className="text-xl font-bold text-primary tracking-tight">{siteConfig.siteName || "NitroDrive"}</h1>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold -mt-0.5">Control Panel</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {isAdmin && (
-              <Button variant="outline" size="sm" onClick={() => navigate("/admin")}>
-                <Shield className="mr-2 h-4 w-4" />
-                Admin Panel
+            {showPaywall && (
+              <Button
+                size="sm"
+                variant="hero"
+                className="nitro-glow"
+                onClick={() => setShowUpgrade(true)}
+              >
+                <Crown className="mr-1.5 h-4 w-4" /> Upgrade Pro
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
+            <Button variant="outline" size="sm" onClick={handleSignOut} className="bg-muted/50 hover:bg-muted">
+              <LogOut className="mr-2 h-4 w-4" /> Logout
             </Button>
           </div>
         </div>
       </nav>
 
       <main className="container mx-auto px-4 py-8">
-        <header className="mb-6">
-          <h2 className="text-3xl font-bold mb-2">Welcome back, {profile?.full_name || "User"}!</h2>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-gradient-hero text-primary-foreground">
-              <Gauge className="h-3 w-3 mr-1" />
-              Free - 1000x Speed
-            </Badge>
-            {isAdmin && <Badge variant="secondary">Admin</Badge>}
+        <header className="mb-8">
+          <h2 className="text-3xl font-extrabold tracking-tight mb-2">Welcome, {profile?.full_name || "User"}!</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            {isPro ? (
+              <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 px-3 py-1 nitro-glow">
+                <Crown className="h-3 w-3 mr-1" /> Nitro Pro Member
+                {profile?.pro_expires_at && (
+                  <span className="ml-1 opacity-70 font-medium">
+                    · Expires {new Date(profile.pro_expires_at).toLocaleDateString()}
+                  </span>
+                )}
+              </Badge>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Badge className="bg-gradient-hero text-primary-foreground nitro-glow">
+                  <Gauge className="h-3 w-3 mr-1" /> Free Nitro - 1000x Speed
+                </Badge>
+                {showPaywall && (
+                  <button
+                    onClick={() => setShowUpgrade(true)}
+                    className="text-xs text-yellow-500 underline underline-offset-4 hover:text-yellow-400 transition-colors font-medium"
+                  >
+                    Unlock Unlimited Access →
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </header>
 
-        <Card className="p-4 md:p-5 bg-card border-border mb-6">
+        {showPaywall && (
+          <Card 
+            className="mb-8 flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border-border/50 hover:bg-muted/30 transition-all cursor-pointer group glass-card"
+            onClick={() => setShowUpgrade(true)}
+          >
+            <div className="h-12 w-12 rounded-xl bg-yellow-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Crown className="h-6 w-6 text-yellow-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-foreground">Nitro Pro is waiting for you!</p>
+              <p className="text-xs text-muted-foreground">Unlimited selective cloning, advanced previews, and no daily limits.</p>
+            </div>
+            <Button size="sm" variant="hero" className="shrink-0 nitro-glow">
+              Go Pro
+            </Button>
+          </Card>
+        )}
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+          <h3 className="text-xl font-bold tracking-tight">Workspace Tools</h3>
+          {drive.connected ? (
+            <Button variant="outline" size="sm" className="border-green-500/30 text-green-500 hover:bg-green-500/10" onClick={() => drive.disconnect()}>
+              <CheckCircle2 className="mr-2 h-4 w-4" /> Drive Connected (Disconnect)
+            </Button>
+          ) : (
+            <Button variant="hero" size="sm" className="nitro-glow" onClick={() => drive.connect(userEmail)}>
+              <Zap className="mr-2 h-4 w-4 fill-primary-foreground" /> Connect Google Drive
+            </Button>
+          )}
+        </div>
+
+        <Card className="p-1 md:p-1 bg-card/60 backdrop-blur-md border-border glass-card overflow-hidden">
           <Tabs defaultValue="clone" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="clone" className="gap-2">
-                <FolderSync className="h-4 w-4" /> Clone Folder
+            <TabsList className="grid w-full grid-cols-3 bg-muted/30 p-1 rounded-none border-b border-border/50">
+              <TabsTrigger value="clone" className="gap-2 data-[state=active]:bg-background/80">
+                <FolderSync className="h-4 w-4" /> Clone
               </TabsTrigger>
-              <TabsTrigger value="upload" className="gap-2">
-                <Upload className="h-4 w-4" /> Upload Files
+              <TabsTrigger value="upload" className="gap-2 data-[state=active]:bg-background/80">
+                <Upload className="h-4 w-4" /> Upload
               </TabsTrigger>
-              <TabsTrigger value="manage" className="gap-2">
-                <Trash2 className="h-4 w-4" /> Manage Files
+              <TabsTrigger value="manage" className="gap-2 data-[state=active]:bg-background/80">
+                <Trash2 className="h-4 w-4" /> Manage
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="clone" className="mt-6">
-              <CloneFolderPanel />
-            </TabsContent>
+            <div className="p-4 md:p-6">
+              <TabsContent value="clone" className="mt-0 animate-in fade-in duration-500">
+                <CloneFolderPanel />
+              </TabsContent>
 
-            <TabsContent value="upload" className="mt-6">
-              <UploadFilesPanel />
-            </TabsContent>
+              <TabsContent value="upload" className="mt-0 animate-in fade-in duration-500">
+                <UploadFilesPanel />
+              </TabsContent>
 
-            <TabsContent value="manage" className="mt-6">
-              <ManageFilesPanel />
-            </TabsContent>
+              <TabsContent value="manage" className="mt-0 animate-in fade-in duration-500">
+                <ManageFilesPanel />
+              </TabsContent>
+            </div>
           </Tabs>
         </Card>
-
-        <Button
-          variant="outline"
-          onClick={() => toast({ title: "Note", description: "Clone workflow added. Upload/Manage tabs will be wired next." })}
-        >
-          What’s next?
-        </Button>
       </main>
+
+      {showUpgrade && (
+        <UpgradeModal
+          userEmail={userEmail}
+          userId={userId}
+          onClose={() => setShowUpgrade(false)}
+        />
+      )}
     </div>
   );
 };
