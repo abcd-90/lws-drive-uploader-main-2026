@@ -175,7 +175,7 @@ export default function CloneFolderPanel() {
         drive.disconnect();
         toast({
           title: "Session Expired",
-          description: "Google Drive login session expire ho gaya hai. Please 'Connect Google Drive' par click karke dubara login/connect karein.",
+          description: "Your Google Drive session has expired. Please click 'Connect Google Drive' to authorize again.",
           variant: "destructive"
         });
       } else {
@@ -263,7 +263,7 @@ export default function CloneFolderPanel() {
         drive.disconnect();
         toast({
           title: "Session Expired",
-          description: "Google Drive login session expire ho gaya hai. Please 'Connect Google Drive' par click karke dubara login/connect karein.",
+          description: "Your Google Drive session has expired. Please click 'Connect Google Drive' to authorize again.",
           variant: "destructive"
         });
       } else {

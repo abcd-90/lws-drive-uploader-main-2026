@@ -81,7 +81,7 @@ export function useGoogleDriveAuth() {
 
       // Google blocks some auth flows inside iframes (shows accounts.google.com blocked).
       if (isInIframe) {
-        setError("Connect Drive preview (iframe) me block ho jata hai. 'Open in new tab' karke phir Connect Drive try karein.");
+        setError("Google Drive connection is blocked inside previews. Please open the site in a new browser tab and try connecting again.");
         return;
       }
 
@@ -104,10 +104,10 @@ export function useGoogleDriveAuth() {
       const timeout = window.setTimeout(() => {
         if (!callbackCalled) {
           setError(
-            "Google window block ho rahi hai (popup/cookies/extensions). AdBlock off, popups allow, third-party cookies allow karke try karein.",
+            "Google popup window might be blocked. Please check your browser's address bar to allow popups, disable AdBlock, and enable third-party cookies.",
           );
         }
-      }, 10_000);
+      }, 25_000);
 
       const tokenClient = googleAny.accounts.oauth2.initTokenClient({
         client_id: clientId,
@@ -117,6 +117,7 @@ export function useGoogleDriveAuth() {
         callback: (resp: { access_token?: string; expires_in?: number; error?: string }) => {
           callbackCalled = true;
           window.clearTimeout(timeout);
+          setError(null); // Clear any timeout error
 
           // Silent attempt can return interaction_required; don't show scary errors.
           if (resp?.error) {
@@ -132,14 +133,14 @@ export function useGoogleDriveAuth() {
             // Friendly messages for common Google Console mis-config
             if (err.toLowerCase().includes("redirect_uri_mismatch")) {
               setError(
-                "Google OAuth setup mismatch (redirect_uri_mismatch). Owner ko Google Cloud Console me is site ka domain Authorized JavaScript origins me add karna hoga.",
+                "Google OAuth setup mismatch (redirect_uri_mismatch). The site owner must add this domain to the Authorized JavaScript origins in the Google Cloud Console.",
               );
               return;
             }
 
             if (err.toLowerCase().includes("invalid_request")) {
               setError(
-                "Google OAuth request invalid (invalid_request). Usually ye tab hota hai jab Google Cloud Console me allowed domains / origins sahi add nahi hotay.",
+                "Google OAuth request is invalid (invalid_request). Please ensure the site's domain is correctly registered in the Google Cloud Console credentials.",
               );
               return;
             }
