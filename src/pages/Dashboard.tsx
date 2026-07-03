@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Zap, Gauge, Upload, FolderSync, Trash2, Crown, Megaphone, CheckCircle2, AlertTriangle, Wrench } from "lucide-react";
+import { LogOut, Zap, Gauge, Upload, FolderSync, Trash2, Crown, Megaphone, CheckCircle2, AlertTriangle, Wrench, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useGoogleDriveAuth } from "@/features/drive/useGoogleDriveAuth";
 import CloneFolderPanel from "@/components/dashboard/CloneFolderPanel";
@@ -192,6 +192,11 @@ const Dashboard = () => {
                 <Crown className="mr-1.5 h-4 w-4" /> Upgrade Pro
               </Button>
             )}
+            <Link to="/">
+              <Button variant="outline" size="sm" className="bg-muted/50 hover:bg-muted">
+                <Home className="mr-2 h-4 w-4" /> Home
+              </Button>
+            </Link>
             <Button variant="outline" size="sm" onClick={handleSignOut} className="bg-muted/50 hover:bg-muted">
               <LogOut className="mr-2 h-4 w-4" /> Logout
             </Button>
