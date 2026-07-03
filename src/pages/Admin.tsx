@@ -204,7 +204,7 @@ const Admin = () => {
       weeklyLimit: "50",
       monthlyLimit: "200",
       yearlyLimit: "Unlimited",
-      channelLink: "https://chat.whatsapp.com/yourchannel",
+      channelLink: "",
       telegramLink: "",
       youtubeLink: "",
     };

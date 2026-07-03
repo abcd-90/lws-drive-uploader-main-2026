@@ -54,7 +54,7 @@ export const DEFAULT_CONFIG: SiteConfig = {
   weeklyLimit: "50",
   monthlyLimit: "200",
   yearlyLimit: "Unlimited",
-  channelLink: "https://chat.whatsapp.com/yourchannel",
+  channelLink: "",
   telegramLink: "",
   youtubeLink: "",
 };
@@ -114,19 +114,40 @@ export async function saveSiteConfig(config: SiteConfig): Promise<{ success: boo
     });
 
     if (error) {
-      // Fallback: try direct update on admin_settings table
-      const { error: updateError } = await (supabase as any)
+      // Fallback: Check if a row exists in admin_settings
+      const { data: existingRows } = await (supabase as any)
         .from("admin_settings")
-        .update({
-          config_json: config,
-          paid_mode_enabled: config.paidModeEnabled,
-          updated_at: new Date().toISOString(),
-        })
-        .not("id", "is", null); // update all rows (there should be only one)
+        .select("id")
+        .limit(1);
 
-      if (updateError) {
-        console.warn("Could not save to Supabase, saved to localStorage only:", updateError.message);
-        return { success: true, error: "Saved locally only. Run the migration SQL in Supabase to enable cloud sync." };
+      if (existingRows && existingRows.length > 0) {
+        // Update the existing row
+        const { error: updateError } = await (supabase as any)
+          .from("admin_settings")
+          .update({
+            config_json: config,
+            paid_mode_enabled: config.paidModeEnabled,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingRows[0].id);
+
+        if (updateError) {
+          console.warn("Could not update settings in Supabase:", updateError.message);
+          return { success: true, error: "Saved locally only. Run the migration SQL in Supabase to enable cloud sync." };
+        }
+      } else {
+        // Table is empty, insert a new row
+        const { error: insertError } = await (supabase as any)
+          .from("admin_settings")
+          .insert({
+            config_json: config,
+            paid_mode_enabled: config.paidModeEnabled,
+          });
+
+        if (insertError) {
+          console.warn("Could not insert settings in Supabase:", insertError.message);
+          return { success: true, error: "Saved locally only. Run the migration SQL in Supabase to enable cloud sync." };
+        }
       }
     }
 
