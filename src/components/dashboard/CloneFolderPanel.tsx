@@ -43,8 +43,8 @@ function TreeItem({ node, selected, onToggle, depth = 0 }: { node: TreeNode; sel
   const [expanded, setExpanded] = useState(depth < 1);
   const isFolder = node.kind === "folder";
   return (
-    <div className="select-none">
-      <div className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-primary/5 transition-colors group">
+    <div className="select-none min-w-0 w-full overflow-hidden">
+      <div className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-primary/5 transition-colors group min-w-0">
         <div style={{ width: `${depth * 16}px` }} />
         {isFolder ? (
           <button onClick={() => setExpanded(!expanded)} className="p-0.5 hover:bg-muted rounded text-muted-foreground">
