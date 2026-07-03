@@ -27,7 +27,7 @@ export type TreeNode =
   | { kind: "folder"; id: string; name: string; children: TreeNode[] }
   | { kind: "file"; id: string; name: string; mimeType: string; shortcutTarget?: { id: string; mimeType: string } };
 
-async function withNitroRetry<T>(fn: () => Promise<T>, tries = 5) {
+async function withNitroRetry<T>(fn: () => Promise<T>, tries = 8) {
   let lastErr: any;
   for (let i = 0; i < tries; i++) {
     try {
@@ -35,8 +35,11 @@ async function withNitroRetry<T>(fn: () => Promise<T>, tries = 5) {
     } catch (e: any) {
       lastErr = e;
       const msg = e?.message || String(e);
-      if (!(msg.includes("429") || msg.includes("limit") || msg.includes("quota")) || i === tries - 1) throw e;
-      await new Promise(r => setTimeout(r, 50 * Math.pow(2, i))); 
+      const isRateLimit = msg.includes("429") || msg.includes("limit") || msg.includes("quota") || msg.includes("403");
+      if (!isRateLimit || i === tries - 1) throw e;
+      // Google rate limits cool down better with longer backoffs and random jitter
+      const backoff = 150 * Math.pow(2, i) + Math.random() * 100;
+      await new Promise(r => setTimeout(r, backoff)); 
     }
   }
   throw lastErr;
@@ -212,6 +215,8 @@ export async function clonePublicFolderToMyDrive(params: {
     name: params.destFolderName || tree.name 
   }));
 
+  const folderLimit = createLimiter(6);
+
   async function processNode(node: TreeNode, destParentId: string) {
     if (params.selectedIds && !params.selectedIds.has(node.id)) {
       // Track replacement slots for exact-filtered files so injected files go to the same folder
@@ -224,7 +229,7 @@ export async function clonePublicFolderToMyDrive(params: {
       flattenFiles.push({ node, parentId: destParentId });
       return;
     }
-    const created = await withNitroRetry(() => myDriveCreateFolder({ accessToken: params.accessToken, name: nameTransform(node.name), parentId: destParentId }));
+    const created = await withNitroRetry(() => folderLimit(() => myDriveCreateFolder({ accessToken: params.accessToken, name: nameTransform(node.name), parentId: destParentId })));
     await Promise.all(node.children.map(c => processNode(c, created.id)));
   }
 
