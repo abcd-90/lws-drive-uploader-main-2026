@@ -21,16 +21,24 @@ import { WhatsAppModal } from "@/components/WhatsAppModal";
 import { CommunityBanner } from "@/components/CommunityBanner";
 import heroBg from "@/assets/hero-bg.jpg";
 import { fetchSiteConfig, DEFAULT_CONFIG } from "@/lib/siteConfig";
+import { supabase } from "@/integrations/supabase/client";
 
 const Home = () => {
   const navigate = useNavigate();
   const [channelLink, setChannelLink] = useState(DEFAULT_CONFIG.channelLink);
 
   useEffect(() => {
+    // Redirect to dashboard if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/dashboard");
+      }
+    });
+
     fetchSiteConfig().then(cfg => {
       if (cfg.channelLink) setChannelLink(cfg.channelLink);
     }).catch(() => {});
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background">

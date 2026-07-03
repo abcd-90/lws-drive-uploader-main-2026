@@ -72,7 +72,7 @@ export const WhatsAppModal = () => {
           </p>
 
           {/* Social Stats container */}
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center bg-[#171821] border border-white/5 rounded-2xl py-2 px-3 max-w-[280px] mx-auto w-full">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center bg-[#171821] border border-white/5 rounded-2xl py-2 px-3 max-w-[320px] mx-auto w-full">
             <div className="flex items-center justify-center gap-2">
               <Users className="h-4 w-4 text-[#facc15]" />
               <div className="text-left leading-none">
@@ -91,7 +91,7 @@ export const WhatsAppModal = () => {
           </div>
           
           {/* Action buttons stack */}
-          <div className="flex flex-col gap-2.5 pt-1 max-w-[320px] mx-auto w-full">
+          <div className="flex flex-col gap-2.5 pt-1 max-w-[360px] mx-auto w-full">
             {whatsappLink && (
               <Button 
                 variant="hero" 
