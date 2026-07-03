@@ -28,12 +28,14 @@ const Home = () => {
   const [channelLink, setChannelLink] = useState(DEFAULT_CONFIG.channelLink);
 
   useEffect(() => {
-    // Redirect to dashboard if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
+    // Only redirect to dashboard if returning from a login callback (url contains hash access_token)
+    if (window.location.hash.includes("access_token")) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate("/dashboard");
+        }
+      });
+    }
 
     fetchSiteConfig().then(cfg => {
       if (cfg.channelLink) setChannelLink(cfg.channelLink);
