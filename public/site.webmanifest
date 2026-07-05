@@ -1,0 +1,17 @@
+{
+  "name": "NitroDrive — Fast Google Drive Toolkit",
+  "short_name": "NitroDrive",
+  "description": "Upload, clone, and manage Google Drive files at high speed.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#facc15",
+  "icons": [
+    {
+      "src": "/og-image.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

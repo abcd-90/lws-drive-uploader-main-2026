@@ -1,10 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Shield, ArrowLeft } from "lucide-react";
+import { SEO, buildWebPageSchema, buildBreadcrumbSchema } from "@/components/SEO";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between py-12 px-6 sm:px-12 md:px-24">
+      <SEO
+        title="Privacy Policy — NitroDrive"
+        description="Read the NitroDrive privacy policy. Learn how we handle your data, Google API access, and account security."
+        jsonLd={[
+          buildWebPageSchema(
+            "Privacy Policy",
+            "Read the NitroDrive privacy policy. Learn how we handle your data, Google API access, and account security.",
+            "https://nitrodrive.site/privacy"
+          ),
+          buildBreadcrumbSchema([
+            { name: "Home", url: "https://nitrodrive.site/" },
+            { name: "Privacy Policy", url: "https://nitrodrive.site/privacy" },
+          ]),
+        ]}
+      />
       <div className="max-w-4xl mx-auto w-full">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">

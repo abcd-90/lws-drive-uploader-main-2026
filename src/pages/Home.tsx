@@ -22,6 +22,7 @@ import { CommunityBanner } from "@/components/CommunityBanner";
 import heroBg from "@/assets/hero-bg.jpg";
 import { fetchSiteConfig, DEFAULT_CONFIG } from "@/lib/siteConfig";
 import { supabase } from "@/integrations/supabase/client";
+import { SEO, buildOrganizationSchema, buildWebSiteSchema, buildWebPageSchema, buildBreadcrumbSchema } from "@/components/SEO";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -44,6 +45,20 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="NitroDrive | Fast Google Drive Toolkit — Upload, Clone & Manage"
+        description="NitroDrive is the fastest Google Drive uploader toolkit. Batch upload files, clone public folders, and manage your Drive with high-speed parallel processing."
+        jsonLd={[
+          buildOrganizationSchema(),
+          buildWebSiteSchema(),
+          buildWebPageSchema(
+            "NitroDrive | Fast Google Drive Toolkit",
+            "NitroDrive is the fastest Google Drive uploader toolkit. Batch upload files, clone public folders, and manage your Drive.",
+            "https://nitrodrive.site/"
+          ),
+          buildBreadcrumbSchema([{ name: "Home", url: "https://nitrodrive.site/" }]),
+        ]}
+      />
       <CommunityBanner />
       <WhatsAppModal />
 
@@ -432,7 +447,7 @@ const Home = () => {
             <div>
               <h4 className="mb-5 font-bold text-sm uppercase tracking-widest text-foreground">Legal & Support</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a></li>
+                <li><Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
                 <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a></li>
                 <li><a href="mailto:nitrodrive.official@gmail.com" className="text-muted-foreground hover:text-primary transition-colors">Contact Support</a></li>
               </ul>

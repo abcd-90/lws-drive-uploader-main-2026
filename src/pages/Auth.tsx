@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Zap, User, Mail, Lock, Eye, EyeOff, ArrowLeft, Users, Upload, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -152,6 +153,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background grid md:grid-cols-2">
+      <SEO
+        title="Sign In — NitroDrive"
+        description="Sign in or create a NitroDrive account to start uploading, cloning, and managing your Google Drive files."
+        noindex
+      />
       {/* Left Side - Form */}
       <div className="flex flex-col p-8 md:p-12 lg:p-16">
         <Link to="/" className="flex items-center gap-2 mb-8 group">

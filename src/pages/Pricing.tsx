@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { SEO, buildSoftwareAppSchema, buildWebPageSchema, buildBreadcrumbSchema } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,22 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="NitroDrive Pricing — Weekly, Monthly & Yearly Pro Plans"
+        description="Choose a NitroDrive Pro plan for unlimited batch uploads, folder cloning, and priority support. Flexible weekly, monthly, and yearly plans available."
+        jsonLd={[
+          buildWebPageSchema(
+            "NitroDrive Pricing",
+            "Choose a NitroDrive Pro plan for unlimited batch uploads, folder cloning, and priority support.",
+            "https://nitrodrive.site/pricing"
+          ),
+          buildBreadcrumbSchema([
+            { name: "Home", url: "https://nitrodrive.site/" },
+            { name: "Pricing", url: "https://nitrodrive.site/pricing" },
+          ]),
+          buildSoftwareAppSchema(prices),
+        ]}
+      />
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
