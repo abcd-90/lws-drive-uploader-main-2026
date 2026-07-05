@@ -257,7 +257,22 @@ const Admin = () => {
       const email = session.user.email || "";
       setCurrentEmail(email);
 
-      let admin = ADMIN_EMAILS.includes(email);
+      // Load config first to fetch dynamic admin email list
+      const liveConfig = await fetchSiteConfig();
+      setConfig(liveConfig);
+      setConfigLoaded(true);
+
+      const dynamicAdmins = liveConfig.adminEmails
+        ? liveConfig.adminEmails.split(",").map(e => e.trim().toLowerCase())
+        : ADMIN_EMAILS.map(e => e.toLowerCase());
+
+      let admin = dynamicAdmins.includes(email.toLowerCase());
+      
+      // Safety backup check
+      if (!admin && ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase())) {
+        admin = true;
+      }
+
       if (!admin) {
         try {
           const { data } = await (supabase as any)
@@ -276,13 +291,6 @@ const Admin = () => {
       if (admin && !dataLoaded.current) {
         dataLoaded.current = true;
         void loadData();
-        // Load live config from Supabase
-        if (!configLoaded) {
-          fetchSiteConfig().then(liveConfig => {
-            setConfig(liveConfig);
-            setConfigLoaded(true);
-          }).catch(() => {});
-        }
       }
     } catch (e) {
       console.error("Admin auth error:", e);
@@ -1242,6 +1250,18 @@ const Admin = () => {
                     </div>
                     <p className="text-[11px] text-muted-foreground">
                       Warning: Make sure to remember this key! You will need to type it next time you enter the Admin panel.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Authorized Admin Emails (comma-separated)</Label>
+                    <Input 
+                      value={config.adminEmails || ""}
+                      onChange={e => setConfig(c => ({ ...c, adminEmails: e.target.value }))}
+                      placeholder="e.g. sheikhsami3082@gmail.com, sheikhsami3010@gmail.com"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Only users logged in with these Google emails will be granted Admin access.
                     </p>
                   </div>
                 </CardContent>
