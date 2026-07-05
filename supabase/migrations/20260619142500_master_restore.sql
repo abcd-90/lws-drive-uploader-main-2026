@@ -422,16 +422,18 @@ BEGIN
       'to', new.email,
       'email', new.email,
       'subject', 'Welcome to the Future of Nitro Drive! ⚡',
-      'html', '<!DOCTYPE html>
-<html>
+      'html', '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to Nitro Drive</title>
   <style type="text/css">
     @import url(''https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap'');
     body { font-family: ''Outfit'', sans-serif, Arial; margin: 0; padding: 0; background-color: #020617; }
     .card { background-color: #1e293b; border-radius: 24px; border: 1px solid #334155; }
     .btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff !important; text-decoration: none; padding: 18px 40px; border-radius: 16px; font-weight: 700; display: inline-block; box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5); }
+    .feature-box { background-color: #0f172a; padding: 25px; border-radius: 20px; border: 1px solid #1e293b; margin-bottom: 15px; text-align: left; }
   </style>
 </head>
 <body>
@@ -439,41 +441,93 @@ BEGIN
     <tr>
       <td align="center" style="padding: 60px 20px;">
         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
+          <!-- Logo -->
           <tr>
             <td align="center" style="padding-bottom: 40px;">
-              <div style="filter: drop-shadow(0 20px 30px rgba(59, 130, 246, 0.3));">
-                <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/nitro_drive_3d_logo.png" alt="Nitro Drive Logo" width="140" style="display: block; outline: none; border: none; text-decoration: none;" />
-              </div>
+              <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/nitro_drive_3d_logo.png" alt="Nitro Drive Logo" width="140" />
             </td>
           </tr>
+          
+          <!-- Header -->
           <tr>
             <td align="center" style="padding-bottom: 40px;">
               <h1 style="margin: 0; color: #ffffff; font-size: 42px; font-weight: 800; line-height: 1.1; letter-spacing: -1px; text-align: center;">Welcome to the Future of <span style="color: #60a5fa;">Nitro Drive</span></h1>
             </td>
           </tr>
+
+          <!-- Main Content Card -->
           <tr>
             <td class="card" style="padding: 40px;">
               <p style="margin: 0 0 30px 0; color: #94a3b8; font-size: 18px; line-height: 1.6;">Hi there, 👋 <br/><br/>The era of slow cloud management is over. You''ve just unlocked the fastest toolkit for Google Drive. Let''s get you set up.</p>
-              <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                  <td width="48%" style="background-color: #0f172a; padding: 24px; border-radius: 20px; border: 1px solid #1e293b;">
-                    <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/quick_start_icon.png" alt="Quick Start" width="40" style="margin-bottom: 15px;" />
-                    <h3 style="margin: 0 0 10px 0; color: #ffffff; font-size: 18px;">Quick Start</h3>
-                    <p style="margin: 0; color: #64748b; font-size: 14px;">Connect your drive and start batch processing in seconds.</p>
-                  </td>
-                  <td width="4%"></td>
-                  <td width="48%" style="background-color: #0f172a; padding: 24px; border-radius: 20px; border: 1px solid #1e293b;">
-                    <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/dashboard_icon.png" alt="Dashboard" width="40" style="margin-bottom: 15px;" />
-                    <h3 style="margin: 0 0 10px 0; color: #ffffff; font-size: 18px;">Dashboard</h3>
-                    <p style="margin: 0; color: #64748b; font-size: 14px;">Monitor your active transfers and manage automation.</p>
-                  </td>
-                </tr>
-              </table>
-              <div style="text-align: center; padding-top: 50px;">
-                <a href="https://nitrodrive.site/dashboard" class="btn">Get Started Now</a>
+              
+              <!-- Box 1: Quick Start -->
+              <div class="feature-box">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td width="50" valign="top">
+                      <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/quick_start_icon.png" width="45" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                      <h3 style="margin: 0 0 5px 0; color: #ffffff; font-size: 18px; font-weight: 700;">Quick Start Setup</h3>
+                      <p style="margin: 0; color: #94a3b8; font-size: 14px; line-height: 1.4;">One-click integration to sync your drive and start processing instantly.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Box 2: Dashboard -->
+              <div class="feature-box">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td width="50" valign="top">
+                      <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/dashboard_icon.png" width="45" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                      <h3 style="margin: 0 0 5px 0; color: #ffffff; font-size: 18px; font-weight: 700;">Live Dashboard</h3>
+                      <p style="margin: 0; color: #94a3b8; font-size: 14px; line-height: 1.4;">Monitor your active transfers and automation tasks in real-time.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Box 3: Smart Move -->
+              <div class="feature-box">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td width="50" valign="top">
+                      <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/smart_move_3d.png" width="45" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                      <h3 style="margin: 0 0 5px 0; color: #ffffff; font-size: 18px; font-weight: 700;">Smart File Move</h3>
+                      <p style="margin: 0; color: #94a3b8; font-size: 14px; line-height: 1.4;">Batch process and move thousands of files at lightning speed.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Box 4: Secure Vault -->
+              <div class="feature-box">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td width="50" valign="top">
+                      <img src="https://ncnypxgushqosmegyzvy.supabase.co/storage/v1/object/public/assests/secure_vault_3d.png" width="45" />
+                    </td>
+                    <td style="padding-left: 15px;">
+                      <h3 style="margin: 0 0 5px 0; color: #ffffff; font-size: 18px; font-weight: 700;">Secure Vault</h3>
+                      <p style="margin: 0; color: #94a3b8; font-size: 14px; line-height: 1.4;">Enterprise-grade security to keep your data safe and protected.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- CTA -->
+              <div style="text-align: center; padding-top: 30px;">
+                <a href="https://nitrodrive.site/dashboard" class="btn">Launch Your Workspace</a>
               </div>
             </td>
           </tr>
+
+          <!-- Footer -->
           <tr>
             <td align="center" style="padding-top: 40px;">
               <p style="margin: 0; color: #475569; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">&copy; 2026 Nitro Drive &bull; The Speed of Light</p>
