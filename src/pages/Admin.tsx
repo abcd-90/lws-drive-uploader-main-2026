@@ -17,7 +17,7 @@ import {
   CreditCard, LogOut, Zap, RefreshCcw, Crown, TrendingUp,
   Activity, Globe, Bell, ToggleLeft,
   Save, Trash2, AlertTriangle, CheckCircle, Plus, XCircle,
-  DollarSign, BarChart3, Wrench, Clock, DownloadCloud
+  DollarSign, BarChart3, Wrench, Clock, DownloadCloud, Eye, EyeOff, Copy
 } from "lucide-react";
 
 import {
@@ -173,6 +173,7 @@ const Admin = () => {
   const [granting, setGranting]             = useState(false);
   const [approvingId, setApprovingId]       = useState<string | null>(null);
   const [revokingId, setRevokingId]         = useState<string | null>(null);
+  const [showAdminKey, setShowAdminKey]     = useState(false);
   const [savingConfig, setSavingConfig]     = useState(false);
   const [exportModal, setExportModal]       = useState<"none" | "full" | "base">("none");
   const [coupons, setCoupons]               = useState<CouponRow[]>([]);
@@ -1209,12 +1210,36 @@ const Admin = () => {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label>Admin Secret Key / Password</Label>
-                    <Input 
-                      type="password"
-                      value={config.adminPassword || "nitro-admin-786"}
-                      onChange={e => setConfig(c => ({ ...c, adminPassword: e.target.value }))}
-                      placeholder="e.g. your-new-secret-key"
-                    />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Input 
+                          type={showAdminKey ? "text" : "password"}
+                          value={config.adminPassword || "nitro-admin-786"}
+                          onChange={e => setConfig(c => ({ ...c, adminPassword: e.target.value }))}
+                          placeholder="e.g. your-new-secret-key"
+                          className="pr-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowAdminKey(!showAdminKey)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showAdminKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(config.adminPassword || "nitro-admin-786");
+                          toast({ title: "Copied! 📋", description: "Admin access key copied to clipboard." });
+                        }}
+                        title="Copy Key"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <p className="text-[11px] text-muted-foreground">
                       Warning: Make sure to remember this key! You will need to type it next time you enter the Admin panel.
                     </p>
