@@ -645,7 +645,7 @@ BEGIN
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td style="padding-bottom: 40px;">
-                    <div class="badge">'' || plan_label || '' PLAN</div>
+                    <div class="badge">' || plan_label || ' PLAN</div>
                   </td>
                   <td align="right" style="padding-bottom: 40px;">
                     <span style="color: #22c55e; font-weight: 800; font-size: 12px;">● LIVE STATUS</span>
@@ -658,15 +658,15 @@ BEGIN
                   <td align="right" style="color: #737373; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 10px;">Expiry Date</td>
                 </tr>
                 <tr>
-                  <td style="color: #ffffff; font-size: 18px; font-weight: 600;">'' || activation_date_str || ''</td>
-                  <td align="right" style="color: #ffffff; font-size: 18px; font-weight: 600;">'' || expiry_date_str || ''</td>
+                  <td style="color: #ffffff; font-size: 18px; font-weight: 600;">' || activation_date_str || '</td>
+                  <td align="right" style="color: #ffffff; font-size: 18px; font-weight: 600;">' || expiry_date_str || '</td>
                 </tr>
               </table>
               <div class="divider"></div>
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td style="color: #737373; font-size: 14px; line-height: 1.6;">
-                    User Account: <span style="color: #ffffff; font-weight: 600;">'' || target_email || ''</span><br/>
+                    User Account: <span style="color: #ffffff; font-weight: 600;">' || target_email || '</span><br/>
                     Status: <span style="color: #d4af37; font-weight: 600;">PRO MEMBER</span>
                   </td>
                 </tr>
