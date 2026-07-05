@@ -16,7 +16,7 @@ import {
   Shield, Users, Settings, History, LayoutDashboard,
   CreditCard, LogOut, Zap, RefreshCcw, Crown, TrendingUp,
   Activity, Globe, Bell, ToggleLeft,
-  Save, Trash2, AlertTriangle, CheckCircle, Plus,
+  Save, Trash2, AlertTriangle, CheckCircle, Plus, XCircle,
   DollarSign, BarChart3, Wrench, Clock, DownloadCloud
 } from "lucide-react";
 
@@ -172,6 +172,7 @@ const Admin = () => {
   const [grantPlan, setGrantPlan]           = useState("monthly");
   const [granting, setGranting]             = useState(false);
   const [approvingId, setApprovingId]       = useState<string | null>(null);
+  const [revokingId, setRevokingId]         = useState<string | null>(null);
   const [savingConfig, setSavingConfig]     = useState(false);
   const [exportModal, setExportModal]       = useState<"none" | "full" | "base">("none");
   const [coupons, setCoupons]               = useState<CouponRow[]>([]);
@@ -452,6 +453,32 @@ const Admin = () => {
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
     }
+  };
+
+  const revokePayment = async (req: PaymentRow) => {
+    if (!window.confirm(`Are you sure you want to revoke premium access for ${req.user_email}? This will remove their Pro status and set the payment request status to rejected.`)) {
+      return;
+    }
+    setRevokingId(req.id);
+    try {
+      const { error } = await (supabase as any).rpc("admin_revoke_payment", {
+        _request_id: req.id,
+        _admin_email: currentEmail
+      });
+
+      if (error) throw error;
+
+      toast({ 
+        title: "Success! 🚫", 
+        description: `Premium revoked for ${req.user_email}.` 
+      });
+      
+      void loadData();
+    } catch (e: any) {
+      console.error("Revocation error:", e);
+      toast({ title: "Revocation Failed", description: e.message, variant: "destructive" });
+    }
+    setRevokingId(null);
   };
 
   // Stats
@@ -867,6 +894,19 @@ const Admin = () => {
                                   className="border-red-500/30 text-red-500 hover:bg-red-500/10"
                                   onClick={() => rejectPayment(req.id, req.user_email)}>
                                   Reject
+                                </Button>
+                              </div>
+                            )}
+                            {req.status === "approved" && (
+                              <div className="flex justify-end gap-2">
+                                <Button size="sm" variant="outline"
+                                  className="border-red-500/30 text-red-500 hover:bg-red-500/10"
+                                  disabled={revokingId === req.id}
+                                  onClick={() => revokePayment(req)}>
+                                  {revokingId === req.id
+                                    ? <RefreshCcw className="h-3 w-3 animate-spin" />
+                                    : <XCircle className="h-3 w-3 mr-1" />}
+                                  Revoke
                                 </Button>
                               </div>
                             )}

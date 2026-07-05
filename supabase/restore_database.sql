@@ -934,6 +934,60 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.admin_approve_payment(UUID, TEXT) TO authenticated;
+
+-- Admin action: revoke payment request
+CREATE OR REPLACE FUNCTION public.admin_revoke_payment(_request_id UUID, _admin_email TEXT)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+DECLARE
+  _actor UUID := auth.uid();
+  _req RECORD;
+BEGIN
+  -- 1. Check if caller is admin
+  IF _actor IS NULL OR NOT public.has_role(_actor, 'admin') THEN
+    RAISE EXCEPTION 'Only admins can revoke payments';
+  END IF;
+
+  -- 2. Get the payment request details
+  SELECT * INTO _req
+  FROM public.payment_requests
+  WHERE id = _request_id;
+
+  IF _req IS NULL THEN
+    RAISE EXCEPTION 'Payment request not found';
+  END IF;
+
+  -- 3. Update user profile to remove pro status
+  UPDATE public.profiles
+  SET is_pro = FALSE,
+      pro_expires_at = NULL,
+      updated_at = now()
+  WHERE user_id = _req.user_id;
+
+  -- 4. Delete related premium grants
+  DELETE FROM public.premium_grants
+  WHERE user_id = _req.user_id 
+    AND plan_key = lower(btrim(_req.plan_key));
+
+  -- 5. Update payment request status to rejected
+  UPDATE public.payment_requests
+  SET status = 'rejected',
+      reviewed_at = now(),
+      reviewed_by = _admin_email
+  WHERE id = _request_id;
+
+  RETURN jsonb_build_object(
+    'user_id', _req.user_id,
+    'email', _req.user_email,
+    'status', 'rejected'
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_revoke_payment(UUID, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_first_admin() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.refresh_expired_premium() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.set_paid_mode(BOOLEAN, TEXT) TO authenticated;
