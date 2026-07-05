@@ -412,7 +412,7 @@ CREATE POLICY "Anyone can view receipt" ON storage.objects FOR SELECT USING (buc
 CREATE OR REPLACE FUNCTION public.send_welcome_email()
 RETURNS trigger AS $$
 DECLARE
-  webhook_url text := 'https://hook.eu2.make.com/ok2d0ustty4h72lk8e8fgcc75hsfgu6b';
+  webhook_url text := 'https://hook.eu2.make.com/k1v3qjqhh93938du64wwlwpemtfmkgwz';
   request_body jsonb;
 BEGIN
   BEGIN
@@ -505,7 +505,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION public.send_subscription_confirmation_email()
 RETURNS trigger AS $$
 DECLARE
-  webhook_url text := 'https://hook.eu2.make.com/ok2d0ustty4h72lk8e8fgcc75hsfgu6b';
+  webhook_url text := 'https://hook.eu2.make.com/k1v3qjqhh93938du64wwlwpemtfmkgwz';
   request_body jsonb;
   plan_label text;
   target_email text;
