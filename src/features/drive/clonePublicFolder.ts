@@ -35,8 +35,18 @@ async function withNitroRetry<T>(fn: () => Promise<T>, tries = 8) {
     } catch (e: any) {
       lastErr = e;
       const msg = e?.message || String(e);
-      const isRateLimit = msg.includes("429") || msg.includes("limit") || msg.includes("quota") || msg.includes("403");
-      if (!isRateLimit || i === tries - 1) throw e;
+      
+      // Determine if the error is a transient rate limit/quota or server error
+      let isRetryable = false;
+      if (msg.includes("[429]") || msg.includes("[500]") || msg.includes("[502]") || msg.includes("[503]") || msg.includes("[504]")) {
+        isRetryable = true;
+      } else if (msg.includes("[403]")) {
+        // Only retry 403 if it is a rate limit or quota issue, not for permission denied
+        isRetryable = /rateLimitExceeded|userRateLimitExceeded|quotaExceeded|usageLimits/i.test(msg);
+      }
+      
+      if (!isRetryable || i === tries - 1) throw e;
+      
       // Google rate limits cool down better with longer backoffs and random jitter
       const backoff = 150 * Math.pow(2, i) + Math.random() * 100;
       await new Promise(r => setTimeout(r, backoff)); 
@@ -148,7 +158,7 @@ export async function clonePublicFolderToMyDrive(params: {
   exactFilterNames?: string[]; // Exact file names to skip & replace with injected files
 }) {
   const onProgress = params.onProgress;
-  const turboLimit = createLimiter(24);
+  const turboLimit = createLimiter(params.concurrency || 15);
   
   // SCAN (NitroDrive now handles this background even if user didn't click scan)
   const tree = await buildPublicFolderTree({ 
