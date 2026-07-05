@@ -295,8 +295,8 @@ const Admin = () => {
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default Secret: nitro-admin-786
-    if (adminPassword === "nitro-admin-786") {
+    const configPassword = config.adminPassword || "nitro-admin-786";
+    if (adminPassword === configPassword) {
       setIsLocked(false);
       localStorage.setItem("nitro_admin_unlocked", "true");
     } else {
@@ -1196,6 +1196,29 @@ const Admin = () => {
                         placeholder="e.g. New feature coming soon!" />
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              <Card className="border-border bg-card/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lock className="h-5 w-5 text-red-500" /> Admin Access Key
+                  </CardTitle>
+                  <CardDescription>Change the secret password used to unlock this Admin panel.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Admin Secret Key / Password</Label>
+                    <Input 
+                      type="password"
+                      value={config.adminPassword || "nitro-admin-786"}
+                      onChange={e => setConfig(c => ({ ...c, adminPassword: e.target.value }))}
+                      placeholder="e.g. your-new-secret-key"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      Warning: Make sure to remember this key! You will need to type it next time you enter the Admin panel.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>

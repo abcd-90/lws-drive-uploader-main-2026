@@ -30,6 +30,7 @@ export interface SiteConfig {
   channelLink: string;
   telegramLink: string;
   youtubeLink: string;
+  adminPassword?: string;
 }
 
 export const DEFAULT_CONFIG: SiteConfig = {
@@ -57,6 +58,7 @@ export const DEFAULT_CONFIG: SiteConfig = {
   channelLink: "",
   telegramLink: "",
   youtubeLink: "",
+  adminPassword: "nitro-admin-786",
 };
 
 /**
