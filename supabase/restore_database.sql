@@ -470,7 +470,7 @@ BEGIN
                 </tr>
               </table>
               <div style="text-align: center; padding-top: 50px;">
-                <a href="https://nitro-drive.vercel.app/dashboard" class="btn">Get Started Now</a>
+                <a href="https://nitrodrive.site/dashboard" class="btn">Get Started Now</a>
               </div>
             </td>
           </tr>
@@ -618,7 +618,7 @@ BEGIN
                 </tr>
               </table>
               <div style="text-align: center; padding-top: 60px;">
-                <a href="https://nitro-drive.vercel.app/dashboard" class="btn-gold">Access Dashboard</a>
+                <a href="https://nitrodrive.site/dashboard" class="btn-gold">Access Dashboard</a>
               </div>
             </td>
           </tr>

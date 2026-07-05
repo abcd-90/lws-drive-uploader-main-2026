@@ -73,7 +73,7 @@ serve(async (req) => {
 
                 <!-- Call to Action Button -->
                 <div style="text-align: center; margin: 40px 0 20px 0;">
-                    <a href="https://nitro-drive.vercel.app/dashboard" style="background-color: #eab308; color: #0f172a; text-decoration: none; padding: 16px 36px; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 10px 15px -3px rgba(234, 179, 8, 0.3);">Launch Dashboard</a>
+                    <a href="https://nitrodrive.site/dashboard" style="background-color: #eab308; color: #0f172a; text-decoration: none; padding: 16px 36px; border-radius: 12px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 10px 15px -3px rgba(234, 179, 8, 0.3);">Launch Dashboard</a>
                 </div>
                 
                 <p style="margin: 40px 0 0 0; padding-top: 25px; border-top: 1px solid #334155; color: #64748b; font-size: 14px;">
