@@ -26,6 +26,7 @@ import { SEO, buildOrganizationSchema, buildWebSiteSchema, buildWebPageSchema, b
 
 const Home = () => {
   const navigate = useNavigate();
+  const [siteConfig, setSiteConfig] = useState(DEFAULT_CONFIG);
   const [channelLink, setChannelLink] = useState(DEFAULT_CONFIG.channelLink);
 
   useEffect(() => {
@@ -39,6 +40,7 @@ const Home = () => {
     }
 
     fetchSiteConfig().then(cfg => {
+      setSiteConfig(cfg);
       if (cfg.channelLink) setChannelLink(cfg.channelLink);
     }).catch(() => {});
   }, [navigate]);
@@ -440,7 +442,12 @@ const Home = () => {
               <ul className="space-y-3 text-sm">
                 <li><Link to="/auth?mode=login" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</Link></li>
                 <li><button onClick={() => window.scrollTo({top: 0, behavior: "smooth"})} className="text-muted-foreground hover:text-primary transition-colors">Features</button></li>
-                <li><Link to="/auth?mode=signup" className="text-muted-foreground hover:text-primary transition-colors text-yellow-500 font-medium">Upgrade Pro 💎</Link></li>
+                {siteConfig.paidModeEnabled && (
+                  <>
+                    <li><Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors">Pricing</Link></li>
+                    <li><Link to="/auth?mode=signup" className="text-muted-foreground hover:text-primary transition-colors text-yellow-500 font-medium">Upgrade Pro 💎</Link></li>
+                  </>
+                )}
               </ul>
             </div>
 
