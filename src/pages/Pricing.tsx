@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { SEO, buildSoftwareAppSchema, buildWebPageSchema, buildBreadcrumbSchema } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 
 const Pricing = () => {
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
   const siteConfig = (() => {
     try { return JSON.parse(localStorage.getItem("lws_admin_config") || "{}"); } catch { return {}; }
   })();
@@ -92,43 +94,67 @@ const Pricing = () => {
           <h1 className="text-5xl font-bold mb-4">
             Upgrade to <span className="text-primary">Pro</span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Get 1000x faster uploads, unlimited transfers, and premium features. No trial available - Pro is worth every rupee!
           </p>
+          <div className="flex justify-center items-center gap-4">
+            <span className={`text-sm font-semibold transition-colors duration-200 ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Weekly / Monthly
+            </span>
+            <button
+              onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
+              className="relative inline-flex h-7 w-12 items-center rounded-full bg-primary/20 hover:bg-primary/30 transition-all duration-200 focus:outline-none"
+              aria-label="Toggle billing period"
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-primary shadow-lg transition-all duration-200 ${
+                  billingPeriod === 'yearly' ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className={`text-sm font-semibold flex items-center gap-2 transition-colors duration-200 ${billingPeriod === 'yearly' ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Yearly
+              <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black border-none font-bold text-[10px] px-1.5 py-0.5 whitespace-nowrap shadow-sm">
+                Save Big!
+              </Badge>
+            </span>
+          </div>
         </div>
       </section>
 
       {/* Pricing Cards */}
       <section className="pb-20 px-4">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Free Plan */}
-            <Card className="p-4 sm:p-8 bg-card border-border relative">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">Free Plan</h3>
-                <p className="text-muted-foreground">Basic features for casual users</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold">0</span>
-                  <span className="text-muted-foreground">PKR</span>
+            <Card className="p-4 sm:p-8 bg-card border-border relative flex flex-col justify-between">
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold mb-2">Free Plan</h3>
+                  <p className="text-muted-foreground">Basic features for casual users</p>
                 </div>
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold">0</span>
+                    <span className="text-muted-foreground">PKR</span>
+                  </div>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {[
+                    { icon: Check, text: "100x Upload Speed", available: true },
+                    { icon: X, text: "Limited Daily Uploads", available: false },
+                    { icon: Check, text: "Basic File Clone", available: true },
+                    { icon: Check, text: "Standard Processing", available: true },
+                    { icon: X, text: "Ads Displayed", available: false },
+                    { icon: X, text: "Email Support Only", available: false },
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <item.icon className={`h-4 w-4 ${item.available ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <span className={item.available ? '' : 'text-muted-foreground'}>{item.text}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  { icon: Check, text: "100x Upload Speed", available: true },
-                  { icon: X, text: "Limited Daily Uploads", available: false },
-                  { icon: Check, text: "Basic File Clone", available: true },
-                  { icon: Check, text: "Standard Processing", available: true },
-                  { icon: X, text: "Ads Displayed", available: false },
-                  { icon: X, text: "Email Support Only", available: false },
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <item.icon className={`h-4 w-4 ${item.available ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={item.available ? '' : 'text-muted-foreground'}>{item.text}</span>
-                  </li>
-                ))}
-              </ul>
               <div className="text-center py-4 bg-secondary rounded-lg">
                 <Gauge className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                 <p className="text-sm font-semibold">Speed: <span className="text-xl">1x</span></p>
@@ -136,147 +162,221 @@ const Pricing = () => {
               </div>
             </Card>
 
-            {/* Pro Weekly */}
-            <Card className="p-4 sm:p-8 bg-card border-primary relative">
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="h-5 w-5 text-primary" />
-                  <h3 className="text-2xl font-bold">Pro Weekly</h3>
-                </div>
-                <p className="text-muted-foreground">Try Pro for a week</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold text-primary">{prices.weekly}</span>
-                  <span className="text-muted-foreground">PKR / week</span>
-                </div>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  { icon: Zap, text: "1000x Upload Speed" },
-                  { icon: Upload, text: "Unlimited Uploads" },
-                  { icon: Check, text: "7 Days Access" },
-                  { icon: Check, text: "All Pro Features" },
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4 text-primary" />
-                    <span>{item.text}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Buy on WhatsApp
-                </Button>
-              </a>
-            </Card>
-
-            {/* Pro Monthly */}
-            <Card className="p-4 sm:p-8 bg-gradient-accent border-2 border-primary relative shadow-lg">
-              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-hero text-primary-foreground">
-                <Crown className="h-3 w-3 mr-1" />
-                Best Value
-              </Badge>
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="h-5 w-5 text-primary" />
-                  <h3 className="text-2xl font-bold">Pro Monthly</h3>
-                </div>
-                <p className="text-muted-foreground">Full month of premium power</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold text-primary">{prices.monthly}</span>
-                  <span className="text-muted-foreground">PKR / month</span>
-                </div>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  { icon: Zap, text: "1000x Upload Speed" },
-                  { icon: Upload, text: "Unlimited Uploads" },
-                  { icon: Check, text: "30 Days Access" },
-                  { icon: Check, text: "All Pro Features" },
-                  { icon: Headphones, text: "Priority Support" },
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4 text-primary" />
-                    <span>{item.text}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button variant="hero" className="w-full" size="lg">
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  Buy on WhatsApp
-                </Button>
-              </a>
-
-              {/* Speed Comparison */}
-              <div className="mt-6 p-4 bg-card rounded-lg border border-border">
-                <p className="text-sm font-semibold mb-3 text-center">Upload Speed Comparison</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Free</span>
-                    <div className="flex-1 mx-2 h-2 bg-secondary rounded-full overflow-hidden">
-                      <div className="h-full bg-muted-foreground w-[10%]" />
+            {/* Card 2: Pro Weekly (Monthly mode) OR Pro Monthly (Yearly mode) */}
+            {billingPeriod === "monthly" ? (
+              <Card className="p-4 sm:p-8 bg-card border-border relative hover:border-primary/50 transition-colors flex flex-col justify-between">
+                <div>
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <h3 className="text-2xl font-bold">Pro Weekly</h3>
                     </div>
-                    <span className="text-xs font-semibold">100x</span>
+                    <p className="text-muted-foreground">Try Pro for a week</p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs">⚡ Pro</span>
-                    <div className="flex-1 mx-2 h-2 bg-secondary rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-hero w-full" />
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-bold text-primary">{prices.weekly}</span>
+                      <span className="text-muted-foreground">PKR / week</span>
                     </div>
-                    <span className="text-xs font-semibold text-primary">1000x</span>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      { icon: Zap, text: "1000x Upload Speed" },
+                      { icon: Upload, text: "Unlimited Uploads" },
+                      { icon: Check, text: "7 Days Access" },
+                      { icon: Check, text: "All Pro Features" },
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4 text-primary" />
+                        <span>{item.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer" className="w-full">
+                  <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Buy on WhatsApp
+                  </Button>
+                </a>
+              </Card>
+            ) : (
+              <Card className="p-4 sm:p-8 bg-card border-border relative hover:border-primary/50 transition-colors flex flex-col justify-between">
+                <div>
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <h3 className="text-2xl font-bold">Pro Monthly</h3>
+                    </div>
+                    <p className="text-muted-foreground">Full month of premium power</p>
+                  </div>
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-bold text-primary">{prices.monthly}</span>
+                      <span className="text-muted-foreground">PKR / month</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      { icon: Zap, text: "1000x Upload Speed" },
+                      { icon: Upload, text: "Unlimited Uploads" },
+                      { icon: Check, text: "30 Days Access" },
+                      { icon: Check, text: "All Pro Features" },
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4 text-primary" />
+                        <span>{item.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer" className="w-full">
+                  <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Buy on WhatsApp
+                  </Button>
+                </a>
+              </Card>
+            )}
+
+            {/* Card 3: Pro Monthly (Monthly mode) OR Pro Yearly (Yearly mode) [Highlighted Card] */}
+            {billingPeriod === "monthly" ? (
+              <Card className="p-4 sm:p-8 bg-gradient-accent border-2 border-primary relative shadow-lg flex flex-col justify-between">
+                <div>
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-hero text-primary-foreground">
+                    <Crown className="h-3 w-3 mr-1" />
+                    Best Value
+                  </Badge>
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <h3 className="text-2xl font-bold">Pro Monthly</h3>
+                    </div>
+                    <p className="text-muted-foreground">Full month of premium power</p>
+                  </div>
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-bold text-primary">{prices.monthly}</span>
+                      <span className="text-muted-foreground">PKR / month</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      { icon: Zap, text: "1000x Upload Speed" },
+                      { icon: Upload, text: "Unlimited Uploads" },
+                      { icon: Check, text: "30 Days Access" },
+                      { icon: Check, text: "All Pro Features" },
+                      { icon: Headphones, text: "Priority Support" },
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4 text-primary" />
+                        <span>{item.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button variant="hero" className="w-full" size="lg">
+                      <MessageCircle className="mr-2 h-5 w-5" />
+                      Buy on WhatsApp
+                    </Button>
+                  </a>
+
+                  {/* Speed Comparison */}
+                  <div className="mt-6 p-4 bg-card rounded-lg border border-border">
+                    <p className="text-sm font-semibold mb-3 text-center">Upload Speed Comparison</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Free</span>
+                        <div className="flex-1 mx-2 h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-muted-foreground w-[10%]" />
+                        </div>
+                        <span className="text-xs font-semibold">100x</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs">⚡ Pro</span>
+                        <div className="flex-1 mx-2 h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-hero w-full" />
+                        </div>
+                        <span className="text-xs font-semibold text-primary">1000x</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-center mt-3 text-primary">
+                      Upgrade to Pro for 1000x more speed! 🚀
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-center mt-3 text-primary">
-                  Upgrade to Pro for 1000x more speed! 🚀
-                </p>
-              </div>
-            </Card>
+              </Card>
+            ) : (
+              <Card className="p-4 sm:p-8 bg-gradient-accent border-2 border-primary relative shadow-lg flex flex-col justify-between">
+                <div>
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black whitespace-nowrap">
+                    <Crown className="h-3 w-3 mr-1 inline" />
+                    Super Saver
+                  </Badge>
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <h3 className="text-2xl font-bold">Pro Yearly</h3>
+                    </div>
+                    <p className="text-muted-foreground">Best for power users</p>
+                  </div>
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-bold text-primary">{prices.yearly}</span>
+                      <span className="text-muted-foreground">PKR / year</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8">
+                    {[
+                      { icon: Zap, text: "1000x Upload Speed" },
+                      { icon: Upload, text: "Unlimited Uploads" },
+                      { icon: Check, text: "365 Days Access" },
+                      { icon: Check, text: "All Pro Features" },
+                      { icon: Headphones, text: "Priority Support" },
+                    ].map((item, i) => (
+                      <li key={i} className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4 text-primary" />
+                        <span>{item.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <a href={whatsappLink("Pro Yearly", prices.yearly)} target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button variant="hero" className="w-full" size="lg">
+                      <MessageCircle className="mr-2 h-5 w-5" />
+                      Buy on WhatsApp
+                    </Button>
+                  </a>
 
-            {/* Pro Yearly */}
-            <Card className="p-4 sm:p-8 bg-card border-primary relative hover:border-primary/80 transition-colors">
-              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black whitespace-nowrap">
-                <Crown className="h-3 w-3 mr-1 inline" />
-                Super Saver
-              </Badge>
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="h-5 w-5 text-primary" />
-                  <h3 className="text-2xl font-bold">Pro Yearly</h3>
+                  {/* Speed Comparison */}
+                  <div className="mt-6 p-4 bg-card rounded-lg border border-border">
+                    <p className="text-sm font-semibold mb-3 text-center">Upload Speed Comparison</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Free</span>
+                        <div className="flex-1 mx-2 h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-muted-foreground w-[10%]" />
+                        </div>
+                        <span className="text-xs font-semibold">100x</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs">⚡ Pro</span>
+                        <div className="flex-1 mx-2 h-2 bg-secondary rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-hero w-full" />
+                        </div>
+                        <span className="text-xs font-semibold text-primary">1000x</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-center mt-3 text-primary">
+                      Upgrade to Pro for 1000x more speed! 🚀
+                    </p>
+                  </div>
                 </div>
-                <p className="text-muted-foreground">Best for power users</p>
-              </div>
-              <div className="mb-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-bold text-primary">{prices.yearly}</span>
-                  <span className="text-muted-foreground">PKR / year</span>
-                </div>
-              </div>
-              <ul className="space-y-3 mb-8">
-                {[
-                  { icon: Zap, text: "1000x Upload Speed" },
-                  { icon: Upload, text: "Unlimited Uploads" },
-                  { icon: Check, text: "365 Days Access" },
-                  { icon: Check, text: "All Pro Features" },
-                  { icon: Headphones, text: "Priority Support" },
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4 text-primary" />
-                    <span>{item.text}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href={whatsappLink("Pro Yearly", prices.yearly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Buy on WhatsApp
-                </Button>
-              </a>
-            </Card>
+              </Card>
+            )}
           </div>
         </div>
       </section>
