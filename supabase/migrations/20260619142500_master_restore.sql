@@ -415,6 +415,12 @@ DECLARE
   webhook_url text := 'https://hook.eu2.make.com/k1v3qjqhh93938du64wwlwpemtfmkgwz';
   request_body jsonb;
 BEGIN
+  -- Only send welcome email if the email is confirmed (either immediately on INSERT or when confirmed on UPDATE)
+  IF (TG_OP = 'INSERT' AND NEW.email_confirmed_at IS NULL) OR
+     (TG_OP = 'UPDATE' AND (NEW.email_confirmed_at IS NULL OR OLD.email_confirmed_at IS NOT NULL)) THEN
+    RETURN NEW;
+  END IF;
+
   BEGIN
     request_body := json_build_object(
       'type', 'welcome',
@@ -742,7 +748,7 @@ CREATE TRIGGER on_auth_user_created_profile
 -- Welcome email trigger (Separate name to avoid collisions)
 DROP TRIGGER IF EXISTS on_auth_user_created_welcome_email ON auth.users;
 CREATE TRIGGER on_auth_user_created_welcome_email
-  AFTER INSERT ON auth.users
+  AFTER INSERT OR UPDATE ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.send_welcome_email();
 
 -- Profiles updated_at trigger
