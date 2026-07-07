@@ -100,8 +100,8 @@ const Pricing = () => {
 
       {/* Pricing Cards */}
       <section className="pb-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Free Plan */}
             <Card className="p-4 sm:p-8 bg-card border-border relative">
               <div className="mb-6">
@@ -164,7 +164,7 @@ const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer">
+              <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                 <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Buy on WhatsApp
@@ -205,7 +205,7 @@ const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer">
+              <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                 <Button variant="hero" className="w-full" size="lg">
                   <MessageCircle className="mr-2 h-5 w-5" />
                   Buy on WhatsApp
@@ -235,6 +235,47 @@ const Pricing = () => {
                   Upgrade to Pro for 1000x more speed! 🚀
                 </p>
               </div>
+            </Card>
+
+            {/* Pro Yearly */}
+            <Card className="p-4 sm:p-8 bg-card border-primary relative hover:border-primary/80 transition-colors">
+              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black whitespace-nowrap">
+                <Crown className="h-3 w-3 mr-1 inline" />
+                Super Saver
+              </Badge>
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Crown className="h-5 w-5 text-primary" />
+                  <h3 className="text-2xl font-bold">Pro Yearly</h3>
+                </div>
+                <p className="text-muted-foreground">Best for power users</p>
+              </div>
+              <div className="mb-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold text-primary">{prices.yearly}</span>
+                  <span className="text-muted-foreground">PKR / year</span>
+                </div>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {[
+                  { icon: Zap, text: "1000x Upload Speed" },
+                  { icon: Upload, text: "Unlimited Uploads" },
+                  { icon: Check, text: "365 Days Access" },
+                  { icon: Check, text: "All Pro Features" },
+                  { icon: Headphones, text: "Priority Support" },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <item.icon className="h-4 w-4 text-primary" />
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href={whatsappLink("Pro Yearly", prices.yearly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Buy on WhatsApp
+                </Button>
+              </a>
             </Card>
           </div>
         </div>
