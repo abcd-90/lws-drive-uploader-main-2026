@@ -5,7 +5,7 @@ import { SEO, buildWebPageSchema, buildBreadcrumbSchema } from "@/components/SEO
 
 const Privacy = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between py-12 px-6 sm:px-12 md:px-24">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between py-6 sm:py-12 px-4 sm:px-12 md:px-24">
       <SEO
         title="Privacy Policy — NitroDrive"
         description="Read the NitroDrive privacy policy. Learn how we handle your data, Google API access, and account security."

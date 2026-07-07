@@ -52,30 +52,31 @@ const Pricing = () => {
       />
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-10 w-10 rounded-lg bg-gradient-hero flex items-center justify-center shadow-glow-primary">
-              <Zap className="h-6 w-6 text-primary-foreground" />
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 min-w-0">
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-hero flex items-center justify-center shadow-glow-primary shrink-0">
+              <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-primary">{siteConfig.siteName || "NitroDrive"}</h1>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Ultra Fast Uploader</p>
+            <div className="min-w-0 leading-tight">
+              <h1 className="text-base sm:text-xl font-bold text-primary truncate">{siteConfig.siteName || "NitroDrive"}</h1>
+              <p className="text-[9px] sm:text-xs text-muted-foreground uppercase tracking-wide truncate hidden min-[380px]:block">Ultra Fast Uploader</p>
             </div>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="sm">
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
+            <Link to="/" className="hidden sm:inline-block">
+              <Button variant="ghost" size="sm" className="h-8 sm:h-9 text-xs sm:text-sm px-2.5 sm:px-3">
                 Home
               </Button>
             </Link>
             <Link to="/auth?mode=login">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="h-8 sm:h-9 text-xs sm:text-sm px-2.5 sm:px-3">
                 Login
               </Button>
             </Link>
             <Link to="/auth?mode=signup">
-              <Button variant="hero" size="sm">
-                Get Started Free
+              <Button variant="hero" size="sm" className="h-8 sm:h-9 text-xs sm:text-sm px-2.5 sm:px-3">
+                <span className="hidden xs:inline">Get Started</span>
+                <span className="xs:hidden">Start</span>
               </Button>
             </Link>
           </div>
@@ -102,7 +103,7 @@ const Pricing = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-3 gap-8">
             {/* Free Plan */}
-            <Card className="p-8 bg-card border-border relative">
+            <Card className="p-4 sm:p-8 bg-card border-border relative">
               <div className="mb-6">
                 <h3 className="text-2xl font-bold mb-2">Free Plan</h3>
                 <p className="text-muted-foreground">Basic features for casual users</p>
@@ -136,7 +137,7 @@ const Pricing = () => {
             </Card>
 
             {/* Pro Weekly */}
-            <Card className="p-8 bg-card border-primary relative">
+            <Card className="p-4 sm:p-8 bg-card border-primary relative">
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Crown className="h-5 w-5 text-primary" />
@@ -172,7 +173,7 @@ const Pricing = () => {
             </Card>
 
             {/* Pro Monthly */}
-            <Card className="p-8 bg-gradient-accent border-2 border-primary relative shadow-lg">
+            <Card className="p-4 sm:p-8 bg-gradient-accent border-2 border-primary relative shadow-lg">
               <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-hero text-primary-foreground">
                 <Crown className="h-3 w-3 mr-1" />
                 Best Value
@@ -284,14 +285,14 @@ const Pricing = () => {
               {whatsappNumber}
             </Button>
           </a>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer">
-              <Button variant="hero" size="lg">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 w-full max-w-md mx-auto sm:max-w-none">
+            <a href={whatsappLink("Pro Monthly", prices.monthly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+              <Button variant="hero" size="lg" className="w-full">
                 Get Pro Monthly - {prices.monthly} PKR
               </Button>
             </a>
-            <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="lg" className="border-primary hover:bg-primary hover:text-primary-foreground">
+            <a href={whatsappLink("Pro Weekly", prices.weekly)} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="w-full border-primary hover:bg-primary hover:text-primary-foreground">
                 Get Pro Weekly - {prices.weekly} PKR
               </Button>
             </a>

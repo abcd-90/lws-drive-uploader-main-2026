@@ -159,7 +159,7 @@ const Auth = () => {
         noindex
       />
       {/* Left Side - Form */}
-      <div className="flex flex-col p-8 md:p-12 lg:p-16">
+      <div className="flex flex-col p-4 sm:p-8 md:p-12 lg:p-16">
         <Link to="/" className="flex items-center gap-2 mb-8 group">
           <ArrowLeft className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
           <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors">Back to Home</span>

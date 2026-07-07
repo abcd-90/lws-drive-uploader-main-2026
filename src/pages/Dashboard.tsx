@@ -177,38 +177,41 @@ const Dashboard = () => {
       )}
 
       <nav className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
           <div 
             onDoubleClick={() => navigate("/admin")}
-            className="flex items-center gap-3 cursor-default select-none"
+            className="flex items-center gap-2 sm:gap-3 cursor-default select-none min-w-0"
           >
-            <div className="h-10 w-10 rounded-xl bg-gradient-hero flex items-center justify-center shadow-glow-primary">
-              <Zap className="h-6 w-6 text-primary-foreground" />
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-gradient-hero flex items-center justify-center shadow-glow-primary shrink-0">
+              <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-primary tracking-tight">{siteConfig.siteName || "NitroDrive"}</h1>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold -mt-0.5">Control Panel</p>
+            <div className="min-w-0 leading-tight">
+              <h1 className="text-base sm:text-xl font-bold text-primary tracking-tight truncate">{siteConfig.siteName || "NitroDrive"}</h1>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-widest font-bold -mt-0.5">Control Panel</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {showPaywall && (
               <Button
                 size="sm"
                 variant="hero"
-                className="nitro-glow"
+                className="nitro-glow h-8 sm:h-9 text-xs sm:text-sm px-2.5 sm:px-3"
                 onClick={() => setShowUpgrade(true)}
               >
-                <Crown className="mr-1.5 h-4 w-4" /> Upgrade Pro
+                <Crown className="h-4 w-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Upgrade Pro</span>
               </Button>
             )}
             <Link to="/">
-              <Button variant="outline" size="sm" className="bg-muted/50 hover:bg-muted">
-                <Home className="mr-2 h-4 w-4" /> Home
+              <Button variant="outline" size="sm" className="bg-muted/50 hover:bg-muted h-8 sm:h-9 text-xs sm:text-sm px-2.5 sm:px-3">
+                <Home className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Home</span>
               </Button>
             </Link>
-            <Button variant="outline" size="sm" onClick={handleSignOut} className="bg-muted/50 hover:bg-muted">
-              <LogOut className="mr-2 h-4 w-4" /> Logout
+            <Button variant="outline" size="sm" onClick={handleSignOut} className="bg-muted/50 hover:bg-muted h-8 sm:h-9 text-xs sm:text-sm px-2.5 sm:px-3">
+              <LogOut className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
@@ -266,27 +269,31 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
           <h3 className="text-xl font-bold tracking-tight">Workspace Tools</h3>
           {drive.connected ? (
-            <Button variant="outline" size="sm" className="border-green-500/30 text-green-500 hover:bg-green-500/10" onClick={() => drive.disconnect()}>
-              <CheckCircle2 className="mr-2 h-4 w-4" /> Drive Connected (Disconnect)
+            <Button variant="outline" size="sm" className="border-green-500/30 text-green-500 hover:bg-green-500/10 text-xs sm:text-sm px-3 py-1.5 h-auto" onClick={() => drive.disconnect()}>
+              <CheckCircle2 className="mr-2 h-4 w-4 shrink-0" />
+              <span>
+                <span className="hidden xs:inline">Drive Connected (Disconnect)</span>
+                <span className="xs:hidden">Disconnect Drive</span>
+              </span>
             </Button>
           ) : (
-            <Button variant="hero" size="sm" className="nitro-glow" onClick={() => drive.connect(userEmail)}>
-              <Zap className="mr-2 h-4 w-4 fill-primary-foreground" /> Connect Google Drive
+            <Button variant="hero" size="sm" className="nitro-glow text-xs sm:text-sm px-3 py-1.5 h-auto" onClick={() => drive.connect(userEmail)}>
+              <Zap className="mr-2 h-4 w-4 fill-primary-foreground shrink-0" /> Connect Google Drive
             </Button>
           )}
         </div>
 
-        <Card className="p-1 md:p-1 bg-card/60 backdrop-blur-md border-border glass-card overflow-hidden">
+        <Card className="p-0 bg-card/60 backdrop-blur-md border-border glass-card overflow-hidden">
           <Tabs defaultValue="clone" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/30 p-1 rounded-none border-b border-border/50">
-              <TabsTrigger value="clone" className="gap-2 data-[state=active]:bg-background/80">
-                <FolderSync className="h-4 w-4" /> Clone
+            <TabsList className="grid w-full grid-cols-3 bg-muted/30 p-1 rounded-none border-b border-border/50 h-auto">
+              <TabsTrigger value="clone" className="gap-1 sm:gap-2 data-[state=active]:bg-background/80 text-xs sm:text-sm py-2">
+                <FolderSync className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> Clone
               </TabsTrigger>
-              <TabsTrigger value="upload" className="gap-2 data-[state=active]:bg-background/80">
-                <Upload className="h-4 w-4" /> Upload
+              <TabsTrigger value="upload" className="gap-1 sm:gap-2 data-[state=active]:bg-background/80 text-xs sm:text-sm py-2">
+                <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> Upload
               </TabsTrigger>
-              <TabsTrigger value="manage" className="gap-2 data-[state=active]:bg-background/80">
-                <Trash2 className="h-4 w-4" /> Manage
+              <TabsTrigger value="manage" className="gap-1 sm:gap-2 data-[state=active]:bg-background/80 text-xs sm:text-sm py-2">
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" /> Manage
               </TabsTrigger>
             </TabsList>
 

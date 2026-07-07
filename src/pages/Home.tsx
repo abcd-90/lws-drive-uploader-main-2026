@@ -63,23 +63,23 @@ const Home = () => {
       <WhatsAppModal />
 
       <header className="sticky top-0 z-50 border-b border-border/70 bg-background/70 backdrop-blur-xl">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+        <div className="container mx-auto flex items-center justify-between px-3 sm:px-4 py-4">
           <div 
             onDoubleClick={() => navigate("/admin")}
-            className="group flex items-center gap-3 cursor-default select-none"
+            className="group flex items-center gap-2 sm:gap-3 cursor-default select-none min-w-0"
           >
-            <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-hero shadow-glow-primary">
+            <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-hero shadow-glow-primary shrink-0">
               <Zap className="h-5 w-5 text-primary-foreground" />
               <span className="pointer-events-none absolute -inset-1 rounded-xl opacity-0 ring-1 ring-ring/50 transition-opacity group-hover:opacity-100" />
             </div>
-            <div className="leading-tight">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold tracking-tight">NitroDrive</span>
-                <Badge variant="secondary" className="border border-border/60">
+            <div className="leading-tight min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-base sm:text-lg font-bold tracking-tight truncate">NitroDrive</span>
+                <Badge variant="secondary" className="border border-border/60 text-[9px] sm:text-xs px-1.5 py-0 hidden min-[380px]:inline-flex">
                   Pro-grade
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Ultra fast uploader • clone • manage</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate hidden sm:block">Ultra fast uploader • clone • manage</p>
             </div>
           </div>
 
@@ -96,14 +96,14 @@ const Home = () => {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-1.5 md:hidden">
             <Link to="/auth?mode=login">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="px-2.5 h-8 text-xs">
                 Login
               </Button>
             </Link>
             <Link to="/auth?mode=signup">
-              <Button variant="hero" size="sm">
+              <Button variant="hero" size="sm" className="px-2.5 h-8 text-xs">
                 Start
               </Button>
             </Link>
@@ -168,20 +168,20 @@ const Home = () => {
                 </Button>
               </div>
 
-              <div className="mt-8 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="mt-8 grid max-w-xl grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { icon: Users, label: "Users", value: "10K+" },
                   { icon: Upload, label: "Uploads", value: "5M+" },
                   { icon: Gauge, label: "Uptime", value: "99.9%" },
                 ].map((s) => (
-                  <Card key={s.label} className="border-border/70 bg-card/50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-secondary/60">
-                        <s.icon className="h-5 w-5 text-primary" />
+                  <Card key={s.label} className="border-border/70 bg-card/50 p-2 sm:p-4">
+                    <div className="flex flex-col xs:flex-row items-center xs:items-start text-center xs:text-left gap-2 sm:gap-3">
+                      <div className="grid h-8 w-8 sm:h-10 sm:w-10 place-items-center rounded-xl bg-secondary/60 shrink-0">
+                        <s.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       </div>
-                      <div>
-                        <p className="text-lg font-bold leading-none">{s.value}</p>
-                        <p className="text-xs text-muted-foreground">{s.label}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm sm:text-lg font-bold leading-none">{s.value}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">{s.label}</p>
                       </div>
                     </div>
                   </Card>
@@ -268,8 +268,8 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-6">
-            <Card className="md:col-span-3 border-border/70 bg-card/50 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <Card className="md:col-span-3 border-border/70 bg-card/50 p-4 sm:p-6">
               <div className="flex items-center gap-3">
                 <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-hero shadow-glow-primary">
                   <Upload className="h-5 w-5 text-primary-foreground" />
@@ -284,7 +284,7 @@ const Home = () => {
               </p>
             </Card>
 
-            <Card className="md:col-span-3 border-border/70 bg-card/50 p-6">
+            <Card className="md:col-span-3 border-border/70 bg-card/50 p-4 sm:p-6">
               <div className="flex items-center gap-3">
                 <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-hero shadow-glow-primary">
                   <FolderSync className="h-5 w-5 text-primary-foreground" />
@@ -299,7 +299,7 @@ const Home = () => {
               </p>
             </Card>
 
-            <Card className="md:col-span-2 border-border/70 bg-card/50 p-6">
+            <Card className="md:col-span-2 border-border/70 bg-card/50 p-4 sm:p-6">
               <div className="grid h-11 w-11 place-items-center rounded-2xl bg-secondary/60">
                 <Shield className="h-5 w-5 text-primary" />
               </div>
@@ -309,7 +309,7 @@ const Home = () => {
               </p>
             </Card>
 
-            <Card className="md:col-span-2 border-border/70 bg-card/50 p-6">
+            <Card className="md:col-span-2 border-border/70 bg-card/50 p-4 sm:p-6">
               <div className="grid h-11 w-11 place-items-center rounded-2xl bg-secondary/60">
                 <Trash2 className="h-5 w-5 text-primary" />
               </div>
@@ -317,7 +317,7 @@ const Home = () => {
               <p className="mt-2 text-sm text-muted-foreground">Clean duplicates in one go.</p>
             </Card>
 
-            <Card className="md:col-span-2 border-border/70 bg-card/50 p-6">
+            <Card className="md:col-span-2 border-border/70 bg-card/50 p-4 sm:p-6">
               <div className="grid h-11 w-11 place-items-center rounded-2xl bg-secondary/60">
                 <Calendar className="h-5 w-5 text-primary" />
               </div>
@@ -344,7 +344,7 @@ const Home = () => {
               </Link>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
                   title: "Sign up",
@@ -362,7 +362,7 @@ const Home = () => {
                   icon: FolderSync,
                 },
               ].map((step, idx) => (
-                <Card key={step.title} className="border-border/70 bg-card/50 p-6">
+                <Card key={step.title} className="border-border/70 bg-card/50 p-4 sm:p-6">
                   <div className="flex items-start justify-between">
                     <div className="grid h-11 w-11 place-items-center rounded-2xl bg-secondary/60">
                       <step.icon className="h-5 w-5 text-primary" />
@@ -383,7 +383,7 @@ const Home = () => {
         <section className="container mx-auto px-4 py-16 md:py-24">
           <Card className="relative overflow-hidden border-border/70 bg-card/50">
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-hero opacity-[0.08]" />
-            <div className="relative p-8 md:p-12">
+            <div className="relative p-5 sm:p-8 md:p-12">
               <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Ready to move faster?</h2>
               <p className="mt-3 max-w-2xl text-muted-foreground">
                 Start free, then level up your workflow with the fastest uploader experience.
@@ -409,7 +409,7 @@ const Home = () => {
 
       <footer className="border-t border-border/40 bg-muted/10 pt-16 pb-12">
         <div className="container mx-auto px-4">
-          <div className="grid gap-12 md:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
             {/* Brand Section */}
             <div className="md:col-span-2 space-y-5">
               <div 

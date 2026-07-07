@@ -34,7 +34,7 @@ export const WhatsAppModal = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-[#0d0e12] border border-white/5 rounded-[24px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)] [&>button]:text-neutral-400 [&>button]:hover:text-white [&>button]:bg-transparent [&>button]:border-none [&>button]:right-6 [&>button]:top-6 [&>button]:transition-colors">
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[420px] mx-auto p-0 overflow-hidden bg-[#0d0e12] border border-white/5 rounded-[24px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)] max-h-[90vh] overflow-y-auto [&>button]:text-neutral-400 [&>button]:hover:text-white [&>button]:bg-transparent [&>button]:border-none [&>button]:right-6 [&>button]:top-6 [&>button]:transition-colors">
         
         {/* VIP ACCESS badge */}
         <div className="absolute top-6 left-6 flex items-center gap-1.5 bg-[#facc15]/10 border border-[#facc15]/20 text-[#facc15] px-3 py-1 rounded-[8px] text-[10px] font-extrabold tracking-wider uppercase">
@@ -55,14 +55,14 @@ export const WhatsAppModal = () => {
         <div className="absolute top-38 right-8 w-2.5 h-1.5 bg-yellow-500 -rotate-12 rounded-sm opacity-85 pointer-events-none" />
         <div className="absolute top-46 right-12 w-2 h-2 bg-purple-500 rotate-12 opacity-85 pointer-events-none" />
 
-        <div className="p-6 pt-10 space-y-4 text-center">
+        <div className="p-4 sm:p-6 pt-10 space-y-4 text-center">
           <DialogHeader className="text-center sm:text-center flex flex-col items-center justify-center">
             {/* Circular Glowing Icon Container */}
             <div className="relative mx-auto mb-2 flex h-20 w-20 items-center justify-center rounded-full border-2 border-[#facc15] bg-[#0d0e12] shadow-[0_0_30px_rgba(250,204,21,0.15)]">
               <Users className="h-9 w-9 text-[#facc15]" />
             </div>
             
-            <DialogTitle className="text-2xl font-extrabold text-white tracking-tight text-center w-full">
+            <DialogTitle className="text-xl sm:text-2xl font-extrabold text-white tracking-tight text-center w-full">
               Join Our <span className="text-[#facc15]">Community</span>
             </DialogTitle>
           </DialogHeader>
@@ -103,7 +103,7 @@ export const WhatsAppModal = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleClose}
-                  className="w-full h-full flex items-center justify-between px-5 text-sm font-extrabold"
+                  className="w-full h-full flex items-center justify-between px-3 sm:px-5 text-xs sm:text-sm font-extrabold"
                 >
                   <div className="w-5 flex items-center justify-start">
                     <MessageCircle className="h-5 w-5" />
@@ -127,7 +127,7 @@ export const WhatsAppModal = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleClose}
-                  className="w-full h-full flex items-center justify-between px-5 text-sm font-extrabold"
+                  className="w-full h-full flex items-center justify-between px-3 sm:px-5 text-xs sm:text-sm font-extrabold"
                 >
                   <div className="w-5 flex items-center justify-start">
                     <Send className="h-5 w-5" />
@@ -151,7 +151,7 @@ export const WhatsAppModal = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleClose}
-                  className="w-full h-full flex items-center justify-between px-5 text-sm font-extrabold"
+                  className="w-full h-full flex items-center justify-between px-3 sm:px-5 text-xs sm:text-sm font-extrabold"
                 >
                   <div className="w-5 flex items-center justify-start">
                     <Youtube className="h-5 w-5" />

@@ -122,15 +122,15 @@ function StatCard({ label, value, icon: Icon, color, sub }: {
 }) {
   return (
     <Card className="border-border bg-card/50">
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{label}</p>
-            <p className="text-3xl font-extrabold">{value}</p>
-            {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider mb-1 truncate">{label}</p>
+            <p className="text-xl sm:text-3xl font-extrabold truncate">{value}</p>
+            {sub && <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">{sub}</p>}
           </div>
-          <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${color}`}>
-            <Icon className="h-6 w-6" />
+          <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
+            <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
         </div>
       </CardContent>
@@ -533,8 +533,8 @@ const Admin = () => {
   // ── Unauthorized ─────────────────────────────────────────────────────────────
   if (isLocked) {
     return (
-      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border-border/50 bg-[#161b22] p-8 shadow-2xl relative overflow-hidden">
+      <div className="min-h-screen bg-[#0d1117] flex items-center justify-center p-2 sm:p-4">
+        <Card className="w-full max-w-md border-border/50 bg-[#161b22] p-4 sm:p-8 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-hero" />
           <div className="flex flex-col items-center text-center">
             <div className="h-16 w-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center mb-6 border border-yellow-500/20">
@@ -606,26 +606,28 @@ const Admin = () => {
     <div className="min-h-screen bg-background text-foreground">
       {/* Navbar */}
       <nav className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shadow-lg">
-              <Zap className="h-5 w-5 text-primary-foreground" />
+        <div className="container mx-auto px-2 sm:px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary flex items-center justify-center shadow-lg shrink-0">
+              <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
             </div>
-            <div>
-              <span className="font-bold text-lg">LWS <span className="text-primary">Admin</span></span>
-              <p className="text-[10px] text-muted-foreground -mt-0.5 uppercase tracking-widest">Control Center</p>
+            <div className="min-w-0">
+              <span className="font-bold text-sm sm:text-lg block sm:inline">LWS <span className="text-primary">Admin</span></span>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-widest hidden sm:block">Control Center</p>
             </div>
-            <Badge variant="outline" className="ml-1 text-primary border-primary/30 text-[10px]">SaaS v3.0</Badge>
+            <Badge variant="outline" className="text-primary border-primary/30 text-[9px] sm:text-[10px] hidden min-[380px]:inline-flex shrink-0">SaaS v3.0</Badge>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <Badge variant="secondary" className="text-xs hidden md:flex">
               <CheckCircle className="h-3 w-3 mr-1 text-green-500" /> {currentEmail}
             </Badge>
-            <Button variant="ghost" size="sm" onClick={loadData} title="Refresh data">
+            <Button variant="ghost" size="sm" onClick={loadData} title="Refresh data" className="h-8 w-8 sm:h-9 sm:w-9">
               <RefreshCcw className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")}>
-              <LogOut className="h-4 w-4 mr-2 rotate-180" /> Exit Admin
+            <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")} className="h-8 sm:h-9 text-xs sm:text-sm px-2 sm:px-3">
+              <LogOut className="h-4 w-4 sm:mr-2 rotate-180" />
+              <span className="hidden sm:inline">Exit Admin</span>
+              <span className="sm:hidden">Exit</span>
             </Button>
           </div>
         </div>
@@ -651,7 +653,7 @@ const Admin = () => {
               { value: "settings",  icon: Settings,        label: "Site Settings" },
             ].map(({ value, icon: Icon, label }) => (
               <TabsTrigger key={value} value={value}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg data-[state=active]:bg-background data-[state=active]:shadow">
+                className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm rounded-lg data-[state=active]:bg-background data-[state=active]:shadow">
                 <Icon className="h-3.5 w-3.5" /> {label}
               </TabsTrigger>
             ))}
@@ -659,7 +661,7 @@ const Admin = () => {
 
           {/* ── DASHBOARD ── */}
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard label="Total Users"     value={users.length}   icon={Users}       color="bg-blue-500/10 text-blue-500"   sub="Registered accounts" />
               <StatCard label="Pro Members"     value={proUsers}       icon={Crown}       color="bg-yellow-500/10 text-yellow-500" sub={`${users.length ? Math.round(proUsers/users.length*100) : 0}% conversion`} />
               <StatCard label="Nitro Revenue"  value={`PKR ${totalRevenue.toLocaleString()}`} icon={DollarSign} color="bg-green-500/10 text-green-500" sub="Total approved payments" />
@@ -1277,7 +1279,7 @@ const Admin = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Create Coupon Form */}
-                <div className="grid md:grid-cols-4 gap-4 items-end p-4 rounded-xl border border-border bg-muted/20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end p-4 rounded-xl border border-border bg-muted/20">
                   <div className="space-y-2">
                     <Label>Coupon Code</Label>
                     <Input 

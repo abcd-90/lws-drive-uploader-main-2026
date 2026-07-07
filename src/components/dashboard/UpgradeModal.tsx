@@ -143,17 +143,17 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary/20 to-yellow-500/10 p-6 border-b border-border">
+        <div className="bg-gradient-to-r from-primary/20 to-yellow-500/10 p-4 sm:p-6 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
                 <Crown className="h-6 w-6 text-yellow-500" />
               </div>
               <div>
-                <h2 className="font-bold text-xl">Upgrade to Pro</h2>
+                <h2 className="font-bold text-lg">Upgrade to Pro</h2>
                 <p className="text-xs text-muted-foreground">{siteConfig.siteName || "NitroDrive"} Premium Access</p>
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4">
           {/* STEP 1: Plan Selection */}
           {step === "plan" && (
             <div className="space-y-4">
@@ -173,21 +173,21 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
                   <button
                     key={p.key}
                     onClick={() => setSelectedPlan(p.key)}
-                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${selectedPlan === p.key ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
+                    className={`w-full flex flex-col xs:flex-row xs:items-center justify-between p-3 sm:p-4 rounded-xl border gap-2 transition-all ${selectedPlan === p.key ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center ${selectedPlan === p.key ? "border-primary" : "border-border"}`}>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className={`h-4 w-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedPlan === p.key ? "border-primary" : "border-border"}`}>
                         {selectedPlan === p.key && <div className="h-2 w-2 rounded-full bg-primary" />}
                       </div>
                       <div className="text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">{p.label}</span>
-                          {p.popular && <Badge className="text-[10px] bg-yellow-500 text-black px-1.5 py-0">Most Popular</Badge>}
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-sm sm:text-base">{p.label}</span>
+                          {p.popular && <Badge className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 leading-none">Most Popular</Badge>}
                         </div>
-                        <span className="text-xs text-muted-foreground">{p.days} days access</span>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">{p.days} days access</span>
                       </div>
                     </div>
-                    <span className="font-bold text-primary text-lg">PKR {p.price.toLocaleString()}</span>
+                    <span className="font-bold text-primary text-base sm:text-lg self-end xs:self-center">PKR {p.price.toLocaleString()}</span>
                   </button>
                 ))}
               </div>
@@ -201,7 +201,7 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
                 <div className="flex-grow border-t border-border"></div>
               </div>
 
-              <div className="space-y-2 p-4 rounded-xl border border-border bg-muted/20">
+              <div className="space-y-2 p-3 sm:p-4 rounded-xl border border-border bg-muted/20">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Have a Coupon Code?</p>
                 <div className="flex gap-2">
                   <input
@@ -209,14 +209,14 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
                     value={couponCode}
                     onChange={e => setCouponCode(e.target.value.toUpperCase())}
                     placeholder="e.g. TRIAL7"
-                    className="flex-1 bg-background border border-input rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary uppercase"
+                    className="flex-1 bg-background border border-input rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-primary uppercase min-w-0"
                   />
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={handleApplyCoupon} 
                     disabled={applyingCoupon}
-                    className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/20"
+                    className="bg-primary/10 hover:bg-primary/20 text-primary border-primary/20 shrink-0"
                   >
                     {applyingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
                   </Button>
@@ -236,29 +236,29 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
 
               <div className="bg-muted/30 rounded-xl p-4 border border-border space-y-3">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Payment Methods:</p>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {paymentInfo.methods.map(m => (
                     <Badge key={m} variant="outline" className="text-xs">{m}</Badge>
                   ))}
                 </div>
                 <div className="bg-background rounded-lg p-3 border border-primary/20">
                   <p className="text-xs text-muted-foreground mb-1">Send payment to:</p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-3">
                     <div>
-                      <p className="font-bold text-xl tracking-wider text-primary">{paymentInfo.number}</p>
-                      <p className="text-sm text-muted-foreground">👤 {paymentInfo.name}</p>
+                      <p className="font-bold text-lg sm:text-xl tracking-wider text-primary">{paymentInfo.number}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">👤 {paymentInfo.name}</p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={copyNumber}>
+                    <Button variant="outline" size="sm" onClick={copyNumber} className="w-full xs:w-auto shrink-0">
                       <Copy className="h-4 w-4 mr-1" /> Copy
                     </Button>
                   </div>
                 </div>
-                <p className="text-xs text-yellow-500 font-medium">
+                <p className="text-[11px] sm:text-xs text-yellow-500 font-medium">
                   ⚠️ Send exactly PKR {plan.price.toLocaleString()}. Take a screenshot before closing!
                 </p>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 <Button variant="outline" onClick={() => setStep("plan")} className="flex-1">← Back</Button>
                 <Button onClick={() => setStep("upload")} className="flex-1 bg-primary text-primary-foreground">
                   I've Paid ✓
@@ -271,21 +271,21 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
           {step === "upload" && (
             <div className="space-y-4">
               <div className="text-center">
-                <p className="font-semibold">Upload Payment Screenshot</p>
+                <p className="font-semibold text-sm sm:text-base">Upload Payment Screenshot</p>
                 <p className="text-xs text-muted-foreground mt-1">Upload your JazzCash / Easypaisa / NayaPay receipt screenshot</p>
               </div>
 
               <div
                 onClick={() => fileRef.current?.click()}
-                className="border-2 border-dashed border-primary/40 rounded-xl p-6 text-center cursor-pointer hover:border-primary/70 hover:bg-primary/5 transition-all"
+                className="border-2 border-dashed border-primary/40 rounded-xl p-4 sm:p-6 text-center cursor-pointer hover:border-primary/70 hover:bg-primary/5 transition-all"
               >
                 {preview ? (
-                  <img src={preview} alt="Receipt" className="max-h-48 mx-auto rounded-lg object-contain" />
+                  <img src={preview} alt="Receipt" className="max-h-40 sm:max-h-48 mx-auto rounded-lg object-contain" />
                 ) : (
                   <div className="space-y-2">
-                    <Upload className="h-10 w-10 mx-auto text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">Click to select your payment screenshot</p>
-                    <p className="text-xs text-muted-foreground">JPG, PNG supported</p>
+                    <Upload className="h-8 w-8 sm:h-10 sm:w-10 mx-auto text-muted-foreground" />
+                    <p className="text-xs sm:text-sm text-muted-foreground">Click to select your payment screenshot</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">JPG, PNG supported</p>
                   </div>
                 )}
               </div>
@@ -295,7 +295,7 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
                 📋 Plan: <b>{plan.label}</b> | Amount: <b>PKR {plan.price.toLocaleString()}</b>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 <Button variant="outline" onClick={() => setStep("payment")} className="flex-1">← Back</Button>
                 <Button onClick={handleSubmit} disabled={submitting || !file} className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold">
                   {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
@@ -313,7 +313,7 @@ export default function UpgradeModal({ userEmail, userId, onClose }: Props) {
               </div>
               <div>
                 <h3 className="text-xl font-bold">Payment Submitted! 🎉</h3>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                   Your payment proof has been received. Admin will verify and activate your
                   premium access within <b>24 hours</b>.
                 </p>
