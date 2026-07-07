@@ -106,6 +106,16 @@ const Auth = () => {
             "Invalid email or password. If you originally signed up with Google, please use 'Continue with Google'.",
           variant: "destructive",
         });
+      } else if (
+        msgLower.includes("user already registered") ||
+        msgLower.includes("user already exists") ||
+        msgLower.includes("already in use")
+      ) {
+        toast({
+          title: "Account already exists",
+          description: "This email address is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Error",
