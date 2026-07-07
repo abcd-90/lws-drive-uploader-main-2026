@@ -1,1 +1,5 @@
 project_id = "dacifjxbxdizqwmdpiho"
+
+[auth.email.template.confirmation]
+subject = "Confirm Your Registration - NitroDrive"
+content_path = "./supabase/auth_templates/confirm_signup.html"

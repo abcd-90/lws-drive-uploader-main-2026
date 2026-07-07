@@ -84,26 +84,26 @@ const Auth = () => {
 
         toast({
           title: "Account created!",
-          description: "Agar email confirmation aa jaye to confirm karke phir login karein.",
+          description: "Please check your inbox and confirm your email before logging in.",
         });
         navigate("/auth?mode=login");
       }
     } catch (error: any) {
       const msg = String(error?.message || "");
       const msgLower = msg.toLowerCase();
-
+ 
       if (msgLower.includes("email not confirmed")) {
         toast({
-          title: "Email confirm required",
-          description: "Apni email inbox me confirmation link open karein, phir login karein.",
+          title: "Email confirmation required",
+          description: "Please check your email inbox and open the confirmation link to complete registration.",
           variant: "destructive",
         });
       } else if (msgLower.includes("invalid login credentials")) {
         // Common confusion: user created account via Google and then tries email/password.
         toast({
-          title: "Login nahi ho raha",
+          title: "Login failed",
           description:
-            "Agar aapne account Google se banaya tha to 'Continue with Google' use karein (email/password us account par kaam nahi karta jab tak aap password set na karein).",
+            "Invalid email or password. If you originally signed up with Google, please use 'Continue with Google'.",
           variant: "destructive",
         });
       } else {
