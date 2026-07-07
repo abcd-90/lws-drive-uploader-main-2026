@@ -69,7 +69,7 @@ const Auth = () => {
         toast({ title: "Welcome back!" });
         navigate("/dashboard");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -81,6 +81,19 @@ const Auth = () => {
           },
         });
         if (error) throw error;
+
+        // If email is already registered, Supabase returns a user but with an empty identities list
+        const isAlreadyRegistered = data.user && data.user.identities && data.user.identities.length === 0;
+
+        if (isAlreadyRegistered) {
+          toast({
+            title: "Account already exists",
+            description: "This email address is already registered. Please sign in instead.",
+            variant: "destructive",
+          });
+          navigate("/auth?mode=login");
+          return;
+        }
 
         toast({
           title: "Account created!",
