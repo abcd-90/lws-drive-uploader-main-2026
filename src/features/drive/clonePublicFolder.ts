@@ -182,7 +182,7 @@ export async function clonePublicFolderToMyDrive(params: {
   };
 
   const flattenFiles: any[] = [];
-  const exactNames = new Set((params.exactFilterNames || []).map(n => normalizeForMatch(n)).filter(Boolean));
+  const exactNames = (params.exactFilterNames || []).map(n => normalizeForMatch(n)).filter(Boolean);
   const replacementSlots: { originalName: string; parentId: string }[] = [];
   onProgress?.({ phase: "creating_folders", message: "Nitro Initializing...", done: 0, total: 0 });
 
@@ -245,7 +245,9 @@ export async function clonePublicFolderToMyDrive(params: {
 
   async function processNode(node: TreeNode, destParentId: string) {
     // 1. If this is a file and matches an exact filter name, always skip it and add to replacements
-    if (node.kind === "file" && exactNames.has(normalizeForMatch(node.name))) {
+    const normalizedNodeName = normalizeForMatch(node.name);
+    const isMatched = exactNames.some(exactName => normalizedNodeName.includes(exactName));
+    if (node.kind === "file" && isMatched) {
       replacementSlots.push({ originalName: node.name, parentId: destParentId });
       return;
     }

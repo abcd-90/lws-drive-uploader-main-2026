@@ -159,8 +159,11 @@ export default function CloneFolderPanel() {
       const exactNames = exactFilterNames.split(",").map(n => normalizeForMatch(n)).filter(Boolean);
       if (exactNames.length > 0) {
         const deselectExact = (n: TreeNode) => {
-          if (n.kind === "file" && exactNames.includes(normalizeForMatch(n.name))) {
-            initial[n.id] = false;
+          if (n.kind === "file") {
+            const norm = normalizeForMatch(n.name);
+            if (exactNames.some(exact => norm.includes(exact))) {
+              initial[n.id] = false;
+            }
           }
           if (n.kind === "folder") n.children.forEach(deselectExact);
         };
