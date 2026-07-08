@@ -244,13 +244,17 @@ export async function clonePublicFolderToMyDrive(params: {
   const folderLimit = createLimiter(10); // Safe limit (10 QPS) to speed up folder creation by ~66%
 
   async function processNode(node: TreeNode, destParentId: string) {
-    if (params.selectedIds && !params.selectedIds.has(node.id)) {
-      // Track replacement slots for exact-filtered files so injected files go to the same folder
-      if (node.kind === "file" && exactNames.has(normalizeForMatch(node.name))) {
-        replacementSlots.push({ originalName: node.name, parentId: destParentId });
-      }
+    // 1. If this is a file and matches an exact filter name, always skip it and add to replacements
+    if (node.kind === "file" && exactNames.has(normalizeForMatch(node.name))) {
+      replacementSlots.push({ originalName: node.name, parentId: destParentId });
       return;
     }
+
+    // 2. Otherwise check if user explicitly deselected it (only if selectedIds is provided)
+    if (params.selectedIds && !params.selectedIds.has(node.id)) {
+      return;
+    }
+
     if (node.kind === "file") {
       flattenFiles.push({ node, parentId: destParentId });
       return;
