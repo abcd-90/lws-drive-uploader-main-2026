@@ -419,6 +419,16 @@ export default function CloneFolderPanel() {
                 <span>{pct}%</span>
               </div>
               <Progress value={pct} className="h-1.5 shadow-glow-primary" />
+              {progress.errors && progress.errors.length > 0 && (
+                <div className="mt-4 p-3 bg-red-950/40 border border-red-500/30 rounded-xl space-y-1.5 text-left max-h-[150px] overflow-y-auto custom-scrollbar">
+                  <div className="text-[10px] font-bold uppercase text-red-400 mb-1">Failed Files Error Log:</div>
+                  {progress.errors.map((err, idx) => (
+                    <div key={idx} className="text-[10px] font-mono text-red-300/90 break-all leading-normal">
+                      • {err}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

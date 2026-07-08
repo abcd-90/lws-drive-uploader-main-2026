@@ -21,6 +21,7 @@ export type CloneProgress = {
   message: string;
   done: number;
   total: number;
+  errors?: string[];
 };
 
 export type TreeNode =
@@ -278,6 +279,7 @@ export async function clonePublicFolderToMyDrive(params: {
   const total = flattenFiles.length + injectionCount;
   let done = 0;
   let failed = 0;
+  const failedErrors: string[] = [];
 
   const copyTask = async (item: any) => {
     const sourceId = item.node.shortcutTarget?.id ?? item.node.id;
@@ -289,15 +291,17 @@ export async function clonePublicFolderToMyDrive(params: {
         const dl = await withNitroRetry(() => publicDriveDownloadFile({ apiKey: params.apiKey, accessToken: params.accessToken, fileId: sourceId, mimeType: item.node.mimeType }));
         await withNitroRetry(() => myDriveUploadFile({ accessToken: params.accessToken, parentId: item.parentId, name: nameTransform(item.node.name + dl.nameSuffix), blob: dl.blob, contentType: dl.contentType }));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.warn(`Failed to clone ${item.node.name}:`, err);
       failed++;
+      const errMsg = err?.message || String(err);
+      failedErrors.push(`${item.node.name}: ${errMsg}`);
     } finally {
       done++;
       const msg = failed > 0 
         ? `Nitro Cloning: ${done}/${total} (${failed} failed)` 
         : `Nitro Cloning: ${done}/${total}`;
-      onProgress?.({ phase: "copying", message: msg, done, total });
+      onProgress?.({ phase: "copying", message: msg, done, total, errors: failedErrors });
     }
   };
 
@@ -310,21 +314,23 @@ export async function clonePublicFolderToMyDrive(params: {
       params.injectedFiles!.map((f) => turboLimit(async () => {
         try {
           await withNitroRetry(() => myDriveUploadFile({ accessToken: params.accessToken, parentId, name: f.name, blob: f, contentType: f.type }));
-        } catch (err) {
+        } catch (err: any) {
           console.warn(`Failed to inject file ${f.name}:`, err);
           failed++;
+          const errMsg = err?.message || String(err);
+          failedErrors.push(`${f.name}: ${errMsg}`);
         } finally {
           done++;
           const msg = failed > 0 
             ? `Nitro Cloning: ${done}/${total} (${failed} failed)` 
             : `Nitro Cloning: ${done}/${total}`;
-          onProgress?.({ phase: "copying", message: msg, done, total });
+          onProgress?.({ phase: "copying", message: msg, done, total, errors: failedErrors });
         }
       }))
     );
     await Promise.all(injectionTasks);
   }
 
-  onProgress?.({ phase: "done", message: failed > 0 ? `Nitro Transfer Complete! (${failed} failed)` : "Nitro Transfer Complete!", done: total, total });
+  onProgress?.({ phase: "done", message: failed > 0 ? `Nitro Transfer Complete! (${failed} failed)` : "Nitro Transfer Complete!", done: total, total, errors: failedErrors });
   return { totalFiles: total, destinationFolderId: rootDest.id };
 }
