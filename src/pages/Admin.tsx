@@ -213,33 +213,55 @@ const Admin = () => {
   }
 
   const loadData = useCallback(async () => {
-    // Profiles
+    // 1. Fetch profiles (graceful fallback)
+    let fetchedProfiles: any[] = [];
     try {
-      const { data } = await (supabase as any).from("profiles").select("*").limit(500);
-      if (data) setUsers(data as UserRow[]);
+      const { data } = await (supabase as any).from("profiles").select("*").limit(1000);
+      if (data) fetchedProfiles = data;
     } catch (_) {}
 
-    // Activity logs
+    // 2. Fetch all activity logs to compile historical logins/transfers users list
+    let activityLogs: any[] = [];
     try {
       const { data } = await (supabase as any)
         .from("activity_logs")
-        .select("id,user_email,event_type,source_name,status,created_at,metadata")
+        .select("id,user_id,user_email,event_type,source_name,status,created_at,metadata")
         .order("created_at", { ascending: false })
-        .limit(200);
-      if (data) setLogs(data as LogRow[]);
+        .limit(5000);
+      if (data) activityLogs = data;
     } catch (_) {}
 
-    // Payment requests — graceful if table doesn't exist yet
+    // Update the local logs state with the most recent 200 logs for display
+    if (activityLogs.length > 0) {
+      setLogs(activityLogs.slice(0, 200) as LogRow[]);
+    }
+
+    // 3. Fetch premium grants to check who has active premium
+    let premiumGrants: any[] = [];
+    try {
+      const { data } = await (supabase as any)
+        .from("premium_grants")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+      if (data) premiumGrants = data;
+    } catch (_) {}
+
+    // 4. Fetch payment requests
+    let paymentReqs: any[] = [];
     try {
       const { data } = await (supabase as any)
         .from("payment_requests")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(200);
-      if (data) setPayments(data as PaymentRow[]);
+        .limit(1000);
+      if (data) {
+        paymentReqs = data;
+        setPayments(data as PaymentRow[]);
+      }
     } catch (_) {}
 
-    // Coupons
+    // 5. Fetch coupons
     try {
       const { data } = await (supabase as any)
         .from("coupons")
@@ -247,7 +269,120 @@ const Admin = () => {
         .order("created_at", { ascending: false });
       if (data) setCoupons(data as CouponRow[]);
     } catch (_) {}
-  }, []);
+
+    // Aggregate users map to bypass RLS limitations
+    const usersMap = new Map<string, UserRow>();
+
+    // Step A: Seed from activity_logs
+    activityLogs.forEach(log => {
+      const email = log.user_email;
+      if (!email) return;
+      const key = email.toLowerCase().trim();
+      if (!usersMap.has(key)) {
+        usersMap.set(key, {
+          user_id: log.user_id || "",
+          full_name: null,
+          is_pro: false,
+          pro_expires_at: null,
+          email: email,
+        });
+      } else {
+        const existing = usersMap.get(key)!;
+        if (!existing.user_id && log.user_id) {
+          existing.user_id = log.user_id;
+        }
+      }
+    });
+
+    // Step B: Seed from payment requests
+    paymentReqs.forEach(req => {
+      const email = req.user_email;
+      if (!email) return;
+      const key = email.toLowerCase().trim();
+      if (!usersMap.has(key)) {
+        usersMap.set(key, {
+          user_id: req.user_id || "",
+          full_name: null,
+          is_pro: false,
+          pro_expires_at: null,
+          email: email,
+        });
+      } else {
+        const existing = usersMap.get(key)!;
+        if (!existing.user_id && req.user_id) {
+          existing.user_id = req.user_id;
+        }
+      }
+    });
+
+    // Step C: Seed and update from premium grants
+    premiumGrants.forEach(g => {
+      const email = g.user_email;
+      if (!email) return;
+      const key = email.toLowerCase().trim();
+
+      const existing = usersMap.get(key);
+      const isGrantActive = g.expires_at ? new Date(g.expires_at) > new Date() : false;
+
+      if (existing) {
+        if (isGrantActive) {
+          existing.is_pro = true;
+        }
+        if (g.expires_at) {
+          if (!existing.pro_expires_at || new Date(g.expires_at) > new Date(existing.pro_expires_at)) {
+            existing.pro_expires_at = g.expires_at;
+          }
+        }
+        if (g.user_id && !existing.user_id) {
+          existing.user_id = g.user_id;
+        }
+      } else {
+        usersMap.set(key, {
+          user_id: g.user_id || "",
+          full_name: null,
+          is_pro: isGrantActive,
+          pro_expires_at: g.expires_at || null,
+          email: email,
+        });
+      }
+    });
+
+    // Step D: Merge/Update with profiles (the records we could fetch, usually just the admin)
+    fetchedProfiles.forEach(p => {
+      let foundKey = "";
+      for (const [key, val] of usersMap.entries()) {
+        if (val.user_id === p.user_id) {
+          foundKey = key;
+          break;
+        }
+      }
+
+      if (foundKey) {
+        const existing = usersMap.get(foundKey)!;
+        existing.full_name = p.full_name;
+        if (p.is_pro) {
+          existing.is_pro = true;
+        }
+        if (p.pro_expires_at) {
+          if (!existing.pro_expires_at || new Date(p.pro_expires_at) > new Date(existing.pro_expires_at)) {
+            existing.pro_expires_at = p.pro_expires_at;
+          }
+        }
+      } else {
+        const email = currentEmail || null;
+        const key = email ? email.toLowerCase().trim() : p.user_id;
+        usersMap.set(key, {
+          user_id: p.user_id,
+          full_name: p.full_name,
+          is_pro: p.is_pro || false,
+          pro_expires_at: p.pro_expires_at || null,
+          email: email,
+        });
+      }
+    });
+
+    setUsers(Array.from(usersMap.values()));
+  }, [currentEmail]);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -1427,13 +1562,17 @@ const Admin = () => {
                           <td className="px-4 py-2">
                             <Badge variant="outline" className="text-[10px] uppercase">{log.event_type}</Badge>
                           </td>
-                          <td className="px-4 py-2 text-xs text-muted-foreground truncate max-w-[200px]">
-                            {log.source_name || "—"}
-                            {log.metadata?.clonedLink && (
-                              <a href={log.metadata.clonedLink} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-500 hover:underline font-bold" title={log.metadata.clonedLink}>
-                                [Link]
-                              </a>
-                            )}
+                          <td className="px-4 py-2 text-xs text-muted-foreground max-w-[250px]">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="truncate flex-1" title={log.source_name || undefined}>
+                                {log.source_name || "—"}
+                              </span>
+                              {log.metadata?.clonedLink && (
+                                <a href={log.metadata.clonedLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-bold shrink-0" title={log.metadata.clonedLink}>
+                                  [Link]
+                                </a>
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-2 text-right">
                             <Badge className={log.status?.includes("success")
